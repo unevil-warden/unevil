@@ -22,3 +22,6 @@ backend/data/exports/*.txt
 
 # OS
 .DS_Store
+
+# Demo render artifacts
+demo/shot_*.png
