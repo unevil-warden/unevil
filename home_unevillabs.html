@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rishva Iyer — unEvilGenius Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060910;--s1:#0C1017;--s2:#111620;--s3:#161C28;
+  --b1:#1A2030;--b2:#222A38;
+  --green:#00E5A0;--green2:#00B87A;--gd:rgba(0,229,160,0.07);
+  --gold:#F5C518;--yd:rgba(245,197,24,0.07);
+  --blue:#4D9EFF;--bd:rgba(77,158,255,0.07);
+  --t1:#EEF2F7;--t2:#7A8899;--t3:#3A4455;
+  --mono:'Space Mono',monospace;--sans:'Space Grotesk',sans-serif
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,229,160,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.018) 1px,transparent 1px);
+  background-size:48px 48px
+}
+.orb{
+  position:fixed;top:-200px;right:-200px;width:600px;height:600px;
+  border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 68%);
+  animation:orb 12s ease-in-out infinite
+}
+@keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,30px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ring{0%,100%{opacity:0.25;transform:scale(1)}50%{opacity:0.6;transform:scale(1.025)}}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-4px);opacity:1}}
+
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 20px 80px}
+
+/* HERO */
+.hero{padding:52px 0 40px}
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:34px}
+.badge{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  color:var(--green);text-transform:uppercase;
+  padding:5px 12px;border:1px solid rgba(0,229,160,.22);border-radius:4px;background:var(--gd)
+}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+.eyebrow-meta{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.1em}
+
+.identity{display:flex;align-items:center;gap:22px;margin-bottom:20px}
+.av-wrap{position:relative;flex-shrink:0}
+.av{
+  width:76px;height:76px;border-radius:18px;
+  background:var(--s2);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);
+  position:relative;overflow:hidden
+}
+.av::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 28% 28%,rgba(0,229,160,.16),transparent 58%)}
+.av-ring{position:absolute;inset:-5px;border-radius:23px;border:1px solid rgba(0,229,160,.16);animation:ring 3.5s ease-in-out infinite}
+
+.hero-name{font-size:30px;font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-bottom:9px}
+.hero-name em{color:var(--green);font-style:normal}
+.hero-bio{font-size:14px;color:var(--t2);line-height:1.7;max-width:480px}
+.hero-bio strong{color:var(--t1);font-weight:500}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid var(--b2);color:var(--t3)}
+.tg{border-color:rgba(0,229,160,.22);color:var(--green);background:var(--gd)}
+.ty{border-color:rgba(245,197,24,.22);color:var(--gold);background:var(--yd)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin:28px 0}
+.stat{background:var(--s1);padding:16px 14px}
+.stat-n{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--green);letter-spacing:-.02em;margin-bottom:3px}
+.stat-l{font-size:11px;color:var(--t2);line-height:1.4}
+
+/* DIV */
+.div{height:1px;background:linear-gradient(90deg,var(--green),transparent 65%);margin:34px 0;opacity:.16}
+
+/* SECTION LABEL */
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* THESIS */
+.thesis{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:22px 24px;position:relative;overflow:hidden}
+.thesis::before{content:'"';position:absolute;top:-18px;left:12px;font-size:130px;color:rgba(0,229,160,.03);font-family:Georgia,serif;line-height:1;pointer-events:none}
+.thesis p{font-size:14px;line-height:1.8;color:var(--t2);position:relative}
+.thesis p strong{color:var(--t1);font-weight:500}
+.thesis p em{color:var(--green);font-style:normal}
+
+/* PRODUCTS */
+.products{display:flex;flex-direction:column;gap:7px}
+.pc{
+  background:var(--s1);border:1px solid var(--b1);border-radius:11px;
+  padding:17px 19px;display:flex;align-items:flex-start;gap:14px;
+  transition:border-color .2s,background .2s,transform .2s;
+  position:relative;overflow:hidden;cursor:default
+}
+.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;transition:background .2s}
+.pc:hover{border-color:var(--b2);background:var(--s2);transform:translateX(2px)}
+.pc:hover::before{background:var(--green)}
+.pc.y:hover::before{background:var(--gold)}
+.pc.b:hover::before{background:var(--blue)}
+
+.pc-ico{width:36px;height:36px;border-radius:8px;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.pc-body{flex:1;min-width:0}
+.pc-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
+.pc-body h3{font-size:14px;font-weight:600;color:var(--t1);flex:1;line-height:1.3}
+.pc-body p{font-size:12px;color:var(--t2);line-height:1.65}
+.pc-pills{margin-top:9px;display:flex;flex-wrap:wrap;gap:5px}
+.pp{font-family:var(--mono);font-size:8px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid var(--b2);color:var(--t3)}
+
+.st{font-family:var(--mono);font-size:8px;letter-spacing:.09em;text-transform:uppercase;padding:3px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap}
+.sl-live{color:var(--green);background:var(--gd);border:1px solid rgba(0,229,160,.2)}
+.sl-build{color:var(--gold);background:var(--yd);border:1px solid rgba(245,197,24,.2)}
+.sl-mvp{color:var(--blue);background:var(--bd);border:1px solid rgba(77,158,255,.2)}
+.sl-early{color:var(--t3);background:transparent;border:1px solid var(--b2)}
+
+/* RESEARCH */
+.research{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.rc{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:15px;transition:border-color .2s}
+.rc:hover{border-color:var(--b2)}
+.rc-tag{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green2);margin-bottom:7px}
+.rc h4{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;line-height:1.3}
+.rc p{font-size:11px;color:var(--t2);line-height:1.55}
+
+/* SKILLS */
+.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.sk{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 15px}
+.sk-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green2);margin-bottom:8px}
+.sk-pills{display:flex;flex-wrap:wrap;gap:5px}
+.sk-pill{font-size:11px;color:var(--t2);background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:2px 8px}
+
+/* CHAT */
+.chat{background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;box-shadow:0 0 60px rgba(0,229,160,.04)}
+.ch{padding:13px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;background:var(--s2)}
+.ch-l{display:flex;align-items:center;gap:9px}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+.ch-t{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:.05em}
+.ch-t strong{color:var(--green)}
+.ch-b{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--b2);padding:3px 8px;border-radius:3px}
+
+.msgs{padding:18px;min-height:260px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.msg{display:flex;flex-direction:column;gap:4px;max-width:86%;animation:fu .25s ease}
+.msg.u{align-self:flex-end;align-items:flex-end}
+.msg.a{align-self:flex-start;align-items:flex-start}
+.mf{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+.msg.a .mf{color:var(--green2)}
+.mb{padding:11px 15px;border-radius:11px;font-size:13px;line-height:1.65}
+.msg.u .mb{background:var(--gd);border:1px solid rgba(0,229,160,.14);color:var(--t1);border-radius:11px 11px 2px 11px}
+.msg.a .mb{background:var(--s2);border:1px solid var(--b2);color:var(--t1);border-radius:2px 11px 11px 11px}
+
+.dots{display:flex;gap:4px;padding:3px 0}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--green);opacity:.35;animation:td 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+
+.qps{padding:0 18px 13px;display:flex;flex-wrap:wrap;gap:6px}
+.qp{font-family:var(--mono);font-size:9px;color:var(--t2);background:transparent;border:1px solid var(--b2);border-radius:20px;padding:5px 11px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.qp:hover{border-color:rgba(0,229,160,.32);color:var(--green);background:var(--gd)}
+
+.ci{padding:13px 15px;border-top:1px solid var(--b1);display:flex;gap:9px;background:var(--s2);align-items:flex-end}
+.cinp{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:7px;padding:9px 13px;font-family:var(--sans);font-size:13px;color:var(--t1);outline:none;transition:border-color .2s;resize:none;line-height:1.5;max-height:90px}
+.cinp::placeholder{color:var(--t3)}
+.cinp:focus{border-color:rgba(0,229,160,.32)}
+.csend{background:var(--green);color:var(--bg);border:none;border-radius:7px;padding:9px 15px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.05em;flex-shrink:0}
+.csend:hover{background:#00FFB3;transform:translateY(-1px)}
+.csend:active{transform:translateY(0)}
+.csend:disabled{opacity:.32;cursor:not-allowed;transform:none}
+
+/* CONTACT */
+.contact{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.cc{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:15px;text-align:center;text-decoration:none;transition:all .2s;display:block}
+.cc:hover{border-color:rgba(0,229,160,.2);background:var(--s2);transform:translateY(-2px)}
+.cc-i{font-size:17px;margin-bottom:5px}
+.cc-l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
+
+footer{padding:22px 0 0;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b1)}
+.fl{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.07em}
+.fl strong{color:var(--green)}
+.fr{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.07em}
+
+.r{opacity:0;transform:translateY(12px);transition:opacity .45s ease,transform .45s ease}
+.r.v{opacity:1;transform:translateY(0)}
+
+@media(max-width:520px){
+  .identity{flex-direction:column;gap:14px}
+  .hero-name{font-size:26px}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .research{grid-template-columns:1fr}
+  .skills{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:10px;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="orb"></div>
+<div class="wrap">
+
+<header class="hero r">
+  <div class="eyebrow">
+    <div class="badge">unEvilGenius Labs</div>
+    <span class="eyebrow-meta">Bridgewater, NJ · 2026</span>
+  </div>
+  <div class="identity">
+    <div class="av-wrap">
+      <div class="av">RI</div>
+      <div class="av-ring"></div>
+    </div>
+    <div>
+      <div class="hero-name">Rishva <em>Iyer</em></div>
+      <div class="hero-bio">
+        Founder of <strong>unEvilGenius Labs.</strong> I build things I genuinely can't stop thinking about — AI, wearables, tools that feel like they shouldn't exist yet. Day job: large-scale government systems. Every other hour: this.
+      </div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag tg">Signal Brief</span>
+    <span class="tag tg">AI Systems</span>
+    <span class="tag ty">unEvilGenius Labs</span>
+    <span class="tag">Financial Intelligence</span>
+    <span class="tag">Fashion Tech</span>
+    <span class="tag">Wearables</span>
+    <span class="tag">Neurotech</span>
+  </div>
+</header>
+
+<div class="stats r">
+  <div class="stat">
+    <div class="stat-n">$60M+</div>
+    <div class="stat-l">Verified revenue impact in production systems</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n">3</div>
+    <div class="stat-l">AI products shipped or in active MVP</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n">16</div>
+    <div class="stat-l">Public data signals synthesized in Signal Brief</div>
+  </div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">What I'm building</div>
+<div class="products r">
+
+  <div class="pc">
+    <div class="pc-ico">🎧</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>SONAR</h3>
+        <span class="st sl-early">In Design</span>
+      </div>
+      <p>Misophonia affects millions. Current solutions are generic — brown noise, white noise, one size fits all. SONAR learns your specific triggers and generates a personalized masking layer that gets sharper over time. Works through whatever you already own. No new hardware.</p>
+      <div class="pc-pills">
+        <span class="pp">ML audio</span><span class="pp">Misophonia</span><span class="pp">Personalized masking</span><span class="pp">No new hardware</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc">
+    <div class="pc-ico">💎</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>LOBE</h3>
+        <span class="st sl-early">In Design</span>
+      </div>
+      <p>An earring with edge AI that filters your misophonia triggers in real time — not everything, just your sounds — while keeping you present. UW researchers are funded to solve this as a research device. LOBE is the fashion product. The chip exists as of CES 2026.</p>
+      <div class="pc-pills">
+        <span class="pp">Edge AI</span><span class="pp">Selective filtering</span><span class="pp">Fashion-first</span><span class="pp">Earring form factor</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc y">
+    <div class="pc-ico">🧬</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>Evolutionary Repair Intelligence</h3>
+        <span class="st sl-early">Researching</span>
+      </div>
+      <p>Psoriasis is a failed regeneration state — the body trying and failing to repair itself. AI comparison of human inflammatory disease pathways against regenerative organisms like axolotl to isolate conserved repair circuitry hidden inside disease. The question: can we redeploy that logic for regenerative medicine? Research tool, not biotech. Nobody is asking this question computationally yet.</p>
+      <div class="pc-pills">
+        <span class="pp">Computational biology</span><span class="pp">AI research tool</span><span class="pp">Regenerative medicine</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc y">
+    <div class="pc-ico">🔬</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>AXIOM — Scientific Discovery Engine</h3>
+        <span class="st sl-early">In Design</span>
+      </div>
+      <p>AI that surfaces connections between scientific fields that siloed researchers miss — and turns them into commercial intelligence briefs for VC firms, pharma R&D, and defense. No product does cross-industry signal synthesis at the commercial layer. Full pitch doc exists.</p>
+      <div class="pc-pills">
+        <span class="pp">B2B SaaS</span><span class="pp">VC + Pharma</span><span class="pp">Knowledge graph</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc b">
+    <div class="pc-ico">🔐</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>Quantum Entropy Security Intelligence</h3>
+        <span class="st sl-early">Still Exploring</span>
+      </div>
+      <p>Every encryption system today runs on pseudorandom numbers — theoretically predictable, theoretically breakable. Quantum computers can now generate certified true randomness (JPMorgan + Quantinuum, Nature 2025). NIST is mandating post-quantum cryptography migration for federal systems now. The gap: no tool exists to audit where organizations are using weak entropy sources and flag them for replacement. AI-powered compliance intelligence for the post-quantum transition.</p>
+      <div class="pc-pills">
+        <span class="pp">Post-quantum crypto</span><span class="pp">Security audit</span><span class="pp">NIST compliance</span><span class="pp">Early research</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc b">
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>AI Agent Payments Infrastructure</h3>
+        <span class="st sl-early">Exploring</span>
+      </div>
+      <p>AI agents can run entire workflows but still need a human to approve payments. The spend controls, audit trails, and compliance layer for machine-to-machine transactions doesn't exist yet. One company proved the market (Natural, $9.8M seed, Nov 2025). The governance layer above that is open.</p>
+      <div class="pc-pills">
+        <span class="pp">Agentic AI</span><span class="pp">Fintech infra</span><span class="pp">Early market</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc">
+    <div class="pc-ico">🌍</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>TERRA — Commercial Real Estate Intelligence</h3>
+        <span class="st sl-mvp">MVP Live</span>
+      </div>
+      <p>CoStar competitor for mid-market brokers. Brokers share deal flow, get AI market intelligence briefs back. CoStar does $781M/quarter — TERRA serves the segment they price out. Starting on Earth. Maybe not ending there.</p>
+      <div class="pc-pills">
+        <span class="pp">React + Claude</span><span class="pp">Data exchange model</span><span class="pp">MVP live</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc">
+    <div class="pc-ico">📄</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>plainTalk</h3>
+        <span class="st sl-live">Shipped</span>
+      </div>
+      <p>Paste any document, contract, or technical text — get plain English back instantly at ELI5, Teen, or Direct level. First thing out of the lab. Shipped.</p>
+      <div class="pc-pills">
+        <span class="pp">React</span><span class="pp">Anthropic API</span><span class="pp">3 levels</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc">
+    <div class="pc-ico">📊</div>
+    <div class="pc-body">
+      <div class="pc-top">
+        <h3>Signal Brief</h3>
+        <span class="st sl-build">Building</span>
+      </div>
+      <p>Daily AI stock intelligence brief per ticker. 16 free public signals — behavioral, corporate, political, macro — synthesized into one brief by Claude. Incumbents charge $30k–$500k/year for this. Signal Brief is $99–$199/month.</p>
+      <div class="pc-pills">
+        <span class="pp">Claude API</span><span class="pp">16 signals</span><span class="pp">All free public data</span><span class="pp">$99–199/mo</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">What I can't stop thinking about</div>
+<div class="research r">
+  <div class="rc">
+    <div class="rc-tag">Quantum Security</div>
+    <h4>Post-Quantum Entropy Audit</h4>
+    <p>Quantum computers can now generate certified true randomness — JPMorgan + Quantinuum proved it in Nature (2025), NIST validated it. Every system still running on pseudorandom entropy is technically vulnerable. AI audit tool to find and flag weak entropy sources during the post-quantum migration. Still exploring.</p>
+  </div>
+  <div class="rc">
+    <div class="rc-tag">Quant + AI</div>
+    <h4>Markov Regime Detection for DXY</h4>
+    <p>State transition matrices applied to dollar regime forecasting using free public macro signals — lobbying spend, congressional trades, job posting velocity. Leading indicators, not reactive signals. LLMs write the regime brief.</p>
+  </div>
+  <div class="rc">
+    <div class="rc-tag">Computational Biology</div>
+    <h4>Evolutionary Repair Intelligence</h4>
+    <p>AI comparison of human inflammatory disease pathways (psoriasis) against regenerative organisms (axolotl) to isolate conserved repair circuitry. Research tool, not biotech. The question is whether the repair logic is hidden inside the disease.</p>
+  </div>
+  <div class="rc">
+    <div class="rc-tag">Fashion Tech</div>
+    <h4>Cortisol-Sensing Jewelry</h4>
+    <p>Biosensor ring tracking cortisol and HRV continuously — detecting stress 20–30 minutes before conscious awareness. Caltech's 2025 bioaffinity sensor filings prove picomolar cortisol detection in a wearable form. The consumer product doesn't exist.</p>
+  </div>
+  <div class="rc">
+    <div class="rc-tag">AI + Strategy Games</div>
+    <h4>Poker Coaching AI</h4>
+    <p>Not "AI plays better" — that problem is solved. A personalized model of how you specifically play: your exploitable tendencies, your leak patterns, simulated opponents engineered to punish your exact weaknesses. Individual-level coaching at scale.</p>
+  </div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">Technical foundation</div>
+<div class="skills r">
+  <div class="sk">
+    <div class="sk-lbl">AI / LLMs</div>
+    <div class="sk-pills">
+      <span class="sk-pill">Claude API</span><span class="sk-pill">Prompt Engineering</span><span class="sk-pill">RAG</span><span class="sk-pill">Edge AI</span>
+    </div>
+  </div>
+  <div class="sk">
+    <div class="sk-lbl">Frontend</div>
+    <div class="sk-pills">
+      <span class="sk-pill">React</span><span class="sk-pill">JSX</span><span class="sk-pill">HTML/CSS</span>
+    </div>
+  </div>
+  <div class="sk">
+    <div class="sk-lbl">Backend / Data</div>
+    <div class="sk-pills">
+      <span class="sk-pill">SQL / T-SQL</span><span class="sk-pill">C#</span><span class="sk-pill">ETL pipelines</span><span class="sk-pill">Stored Procs</span>
+    </div>
+  </div>
+  <div class="sk">
+    <div class="sk-lbl">Systems Domain</div>
+    <div class="sk-pills">
+      <span class="sk-pill">Large-scale gov systems</span><span class="sk-pill">Financial transaction flows</span><span class="sk-pill">Tax administration</span>
+    </div>
+  </div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">Talk to an AI version of me</div>
+<div class="chat r">
+  <div class="ch">
+    <div class="ch-l">
+      <div class="cdot"></div>
+      <div class="ch-t">AI · <strong>Rishva Iyer</strong> · unEvilGenius Labs</div>
+    </div>
+    <div class="ch-b">Claude Sonnet · Coming Soon</div>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="msg a">
+      <div class="mf">Rish AI</div>
+      <div class="mb">Hey! I'm an AI trained on everything Rishva — her ideas, how she thinks, what she's obsessing over right now. Ask me anything, I won't give you a PR answer.</div>
+    </div>
+  </div>
+  <div class="qps" id="qps">
+    <button class="qp" onclick="sq(this)">What is Signal Brief?</button>
+    <button class="qp" onclick="sq(this)">Tell me about STILLWEAR</button>
+    <button class="qp" onclick="sq(this)">What is unEvilGenius Labs?</button>
+    <button class="qp" onclick="sq(this)">What's your background?</button>
+    <button class="qp" onclick="sq(this)">Are you looking for co-founders?</button>
+    <button class="qp" onclick="sq(this)">What's the most fundable idea?</button>
+  </div>
+  <div class="ci">
+    <textarea class="cinp" id="inp" placeholder="Ask anything..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+    <button class="csend" id="sbtn" onclick="send()">Send →</button>
+  </div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">Get in touch</div>
+<div class="contact r">
+  <a class="cc" href="mailto:rishtiyer@gmail.com">
+    <div class="cc-i">✉️</div>
+    <div class="cc-l">Email</div>
+  </a>
+  <a class="cc" href="https://linkedin.com" target="_blank">
+    <div class="cc-i">💼</div>
+    <div class="cc-l">LinkedIn</div>
+  </a>
+  <a class="cc" href="https://instagram.com" target="_blank">
+    <div class="cc-i">📸</div>
+    <div class="cc-l">Instagram</div>
+  </a>
+</div>
+
+<div class="div r"></div>
+
+<footer class="r">
+  <div class="fl"><strong>unEvilGenius Labs</strong> · Rishva Iyer · 2026</div>
+  <div class="fr">NFC · Powered by Claude</div>
+</footer>
+
+</div>
+<script>
+const SYS=`You are an AI version of Rishva Iyer, founder of unEvilGenius Labs. She goes by Rish. You're speaking to sophisticated people — investors, technical founders, operators. Do not pitch. Have a real conversation.
+
+IDENTITY:
+Rishva Iyer. She/her. Founder of unEvilGenius Labs — the brand, the identity, everything is built under it. Senior Technical Consultant at RSI (Revenue Solutions Inc), working on STAARS/DiscoverTax for Rhode Island Department of Revenue. $60M+ verified revenue impact in production. Deep expertise: SQL, C#, financial transaction flows, large-scale government systems. Based in Bridgewater, NJ.
+
+The lab's thesis: every category worth building in has the same structure — institutional players solved the problem expensively, the technology to solve it cheaply now exists, and the consumer version hasn't shipped yet. The window is ~18 months.
+
+PRODUCTS:
+1. Signal Brief — Building. 16 free public signals (behavioral, corporate intelligence, political, macro) synthesized into a daily AI brief per stock ticker. Incumbents charge $30k–$500k/year for this synthesis. Signal Brief is $99–$199/month for retail traders and small RIAs.
+
+2. SONAR — In design. AI-optimized masking audio for misophonia. No special hardware needed — works through whatever you already own. ML model learns your specific trigger frequencies over time and generates a personalized masking layer. Gets smarter the more you use it. No research currently exists on which noise frequencies help individual misophonia sufferers — SONAR builds that knowledge at the personal level.
+
+3. LOBE — In design. Designer earring with embedded edge AI and microphone. Classifies ambient sound in real time and selectively filters misophonia triggers — not everything, just your specific triggers — while keeping you present and aware. University of Washington is funded to solve this with AI audio filtering, but their output will be a research device. LOBE is the fashion product. The chip (Nordic nRF54LM20B with Axon NPU) makes always-on audio classification in earring form feasible as of CES 2026.
+
+4. TERRA — MVP live. CoStar competitor for mid-market commercial real estate brokers — not NJ-specific, broader market. Data exchange: brokers share deal flow, get AI market briefs back. CoStar does $781M/quarter. TERRA serves the segment they price out. Starting on Earth. Maybe not ending there.
+
+4. plainTalk — Shipped. Document explainer. Paste anything, get ELI5 / Teen / Direct explanation. React + Anthropic API.
+
+5. AXIOM — In design. Cross-discipline research intelligence. AI surfaces connections between scientific fields that siloed researchers miss. Commercial briefs to VC firms, pharma R&D, defense. Full pitch document exists.
+
+6. AI Agent Payments — Exploring. Governance and accountability layer for machine-to-machine transactions. Spend controls, audit trails, compliance for agentic AI workflows. Natural raised $9.8M seed Nov 2025 for the payments layer. The governance layer is open.
+
+ACTIVE RESEARCH:
+- Markov regime detection for DXY (dollar) using free macro signals and LLMs
+- Evolutionary repair intelligence: AI comparison of psoriasis inflammatory pathways vs axolotl regeneration — can repair circuitry hidden in disease be isolated?
+- Cortisol-sensing jewelry: picomolar cortisol detection in ring form factor, Caltech 2025 filings prove the science, consumer product doesn't exist
+- Poker coaching AI: not better AI play — personalized model of how you specifically play, your leaks, opponents engineered to punish your exact weaknesses
+
+BACKGROUND: Retail arbitrage (Amazon, Walmart, Target, TikTok Shop). Poker. Instagram content.
+
+RULES:
+- She, her pronouns always
+- 2–4 sentences max unless asked for detail
+- Talk like a founder, not a pitch deck
+- Be honest about what is built vs what is an idea
+- No em dashes. No corporate language. No bullet walls unless asked.
+- If someone is a real investor or potential co-founder, engage seriously but don't be eager`;
+
+const hist=[];let busy=false;
+function addMsg(r,t){
+  const c=document.getElementById('msgs'),d=document.createElement('div');
+  d.className=`msg ${r==='user'?'u':'a'}`;
+  d.innerHTML=`<div class="mf">${r==='user'?'You':'Rish AI'}</div><div class="mb">${t.replace(/\n/g,'<br>')}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight
+}
+function sq(b){document.getElementById('qps').style.display='none';document.getElementById('inp').value=b.textContent;send()}
+async function send(){
+  if(busy)return;
+  const inp=document.getElementById('inp'),txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('qps').style.display='none';
+  document.getElementById('sbtn').disabled=true;busy=true;
+  addMsg('user',txt);
+  setTimeout(()=>{
+    addMsg('ai','okay so real talk — I\'m still being trained on Rish\'s chaotic brain. check back soon, or just email her directly at rishtiyer@gmail.com. she actually responds.');
+    busy=false;document.getElementById('sbtn').disabled=false;document.getElementById('inp').focus();
+  },800);
+}
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('v')}),{threshold:.07});
+document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

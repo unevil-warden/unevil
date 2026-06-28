@@ -1,7 +1,11 @@
 import pw from '/opt/node22/lib/node_modules/playwright/index.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 const { chromium } = pw;
 
-const file = 'file://' + process.cwd() + '/index.html';
+// The live demo lives at the repo root (index.html); this script lives in replygraph/demo/.
+const here = path.dirname(fileURLToPath(import.meta.url));
+const file = 'file://' + path.resolve(here, '../../index.html');
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 860 }, deviceScaleFactor: 2 });
 await page.goto(file);

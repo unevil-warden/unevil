@@ -1,564 +1,540 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rishva Iyer — unEvilGenius Labs</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ReplyGraph — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#060910;--s1:#0C1017;--s2:#111620;--s3:#161C28;
-  --b1:#1A2030;--b2:#222A38;
-  --green:#00E5A0;--green2:#00B87A;--gd:rgba(0,229,160,0.07);
-  --gold:#F5C518;--yd:rgba(245,197,24,0.07);
-  --blue:#4D9EFF;--bd:rgba(77,158,255,0.07);
-  --t1:#EEF2F7;--t2:#7A8899;--t3:#3A4455;
-  --mono:'Space Mono',monospace;--sans:'Space Grotesk',sans-serif
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(0,229,160,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.018) 1px,transparent 1px);
-  background-size:48px 48px
-}
-.orb{
-  position:fixed;top:-200px;right:-200px;width:600px;height:600px;
-  border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 68%);
-  animation:orb 12s ease-in-out infinite
-}
-@keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,30px)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
-@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ring{0%,100%{opacity:0.25;transform:scale(1)}50%{opacity:0.6;transform:scale(1.025)}}
-@keyframes td{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-4px);opacity:1}}
+  :root {
+    --bg: #ffffff;
+    --ink: #0a0a0a;
+    --muted: #6b6b6b;
+    --faint: #9a9a9a;
+    --line: #e6e6e6;
+    --line-strong: #0a0a0a;
+    --pop: #2348ff;
+    --pop-tint: #eef1ff;
+    --panel: #fafafa;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: flex; height: 100vh; overflow: hidden; }
 
-.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 20px 80px}
+  /* Sidebar */
+  .side { width: 232px; min-width: 232px; border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 28px 18px; }
+  .brand { display: flex; align-items: center; gap: 9px; padding: 0 6px 28px; }
+  .brand .dot { width: 11px; height: 11px; background: var(--pop); border-radius: 50%; }
+  .brand h1 { font-size: 15px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav button {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 10px 12px; border: none; background: none;
+    font-family: var(--font); font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--faint); cursor: pointer; text-align: left;
+    border-radius: 7px; transition: color .12s, background .12s;
+  }
+  .nav button:hover { color: var(--ink); }
+  .nav button.active { color: var(--ink); background: var(--panel); }
+  .nav button.active .tick { width: 6px; height: 6px; background: var(--pop); border-radius: 50%; }
+  .nav .tick { width: 6px; height: 6px; background: transparent; border-radius: 50%; }
+  .side-foot { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); }
+  .status { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .status .ring { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--ink); }
+  .sync {
+    width: 100%; padding: 9px; border: 1px solid var(--line-strong); background: var(--ink); color: #fff;
+    font-family: var(--font); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; border-radius: 7px;
+  }
+  .sync:hover { background: #222; }
 
-/* HERO */
-.hero{padding:52px 0 40px}
-.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:34px}
-.badge{
-  display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
-  color:var(--green);text-transform:uppercase;
-  padding:5px 12px;border:1px solid rgba(0,229,160,.22);border-radius:4px;background:var(--gd)
-}
-.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
-.eyebrow-meta{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.1em}
+  /* Main */
+  .main { flex: 1; overflow-y: auto; }
+  .wrap { max-width: 1180px; padding: 40px 48px; }
+  .head { margin-bottom: 34px; }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pop); margin-bottom: 10px; }
+  .head h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  .head p { color: var(--muted); margin-top: 8px; font-size: 13px; }
 
-.identity{display:flex;align-items:center;gap:22px;margin-bottom:20px}
-.av-wrap{position:relative;flex-shrink:0}
-.av{
-  width:76px;height:76px;border-radius:18px;
-  background:var(--s2);border:1px solid var(--b2);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);
-  position:relative;overflow:hidden
-}
-.av::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 28% 28%,rgba(0,229,160,.16),transparent 58%)}
-.av-ring{position:absolute;inset:-5px;border-radius:23px;border:1px solid rgba(0,229,160,.16);animation:ring 3.5s ease-in-out infinite}
+  /* Generic */
+  .row { display: flex; }
+  .between { justify-content: space-between; align-items: flex-start; }
+  .muted { color: var(--muted); }
+  .faint { color: var(--faint); }
+  .sm { font-size: 12px; }
+  .xs { font-size: 11px; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
+  .rule-strong { border-top: 1.5px solid var(--ink); }
 
-.hero-name{font-size:30px;font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-bottom:9px}
-.hero-name em{color:var(--green);font-style:normal}
-.hero-bio{font-size:14px;color:var(--t2);line-height:1.7;max-width:480px}
-.hero-bio strong{color:var(--t1);font-weight:500}
+  /* Stat / widget grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .cell { background: var(--bg); padding: 22px; }
+  .cell .label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .cell .num { font-size: 46px; font-weight: 800; letter-spacing: -0.03em; margin-top: 10px; line-height: 1; }
+  .cell .num.pop { color: var(--pop); }
+  .cell .sub { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+  .cell .sub div { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 7px; }
+  .cell .sub div b { color: var(--ink); font-weight: 600; }
 
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid var(--b2);color:var(--t3)}
-.tg{border-color:rgba(0,229,160,.22);color:var(--green);background:var(--gd)}
-.ty{border-color:rgba(245,197,24,.22);color:var(--gold);background:var(--yd)}
+  /* Tags */
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--ink); border-radius: 100px; }
+  .tag.solid { background: var(--ink); color: #fff; }
+  .tag.pop { border-color: var(--pop); color: var(--pop); }
+  .tag.ghost { border-color: var(--line); color: var(--faint); }
 
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin:28px 0}
-.stat{background:var(--s1);padding:16px 14px}
-.stat-n{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--green);letter-spacing:-.02em;margin-bottom:3px}
-.stat-l{font-size:11px;color:var(--t2);line-height:1.4}
+  /* Inbox */
+  .inbox { display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
+  .threads { border-right: 1px solid var(--line); overflow-y: auto; }
+  .threads-head { padding: 26px 24px 16px; position: sticky; top: 0; background: var(--bg); }
+  .threads-head .eyebrow { margin-bottom: 6px; }
+  .threads-head h3 { font-size: 20px; font-weight: 800; }
+  .filters { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+  .chip { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 10px; border: 1px solid var(--line); background: none; border-radius: 100px; cursor: pointer; color: var(--muted); font-family: var(--font); }
+  .chip.on { border-color: var(--ink); color: var(--ink); }
+  .thread { padding: 16px 24px; border-bottom: 1px solid var(--line); cursor: pointer; border-left: 2px solid transparent; }
+  .thread:hover { background: var(--panel); }
+  .thread.active { border-left: 2px solid var(--pop); background: var(--panel); }
+  .thread .t-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .thread .name { font-weight: 700; font-size: 13px; }
+  .thread .when { font-size: 10px; color: var(--faint); letter-spacing: 0.04em; }
+  .thread .prev { font-size: 12px; color: var(--muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .thread .t-meta { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
 
-/* DIV */
-.div{height:1px;background:linear-gradient(90deg,var(--green),transparent 65%);margin:34px 0;opacity:.16}
+  .detail { overflow-y: auto; padding: 34px 40px; }
+  .convo { display: flex; flex-direction: column; gap: 8px; margin: 22px 0; max-height: 320px; overflow-y: auto; padding-right: 6px; }
+  .msg { max-width: 74%; }
+  .msg.me { align-self: flex-end; }
+  .msg.them { align-self: flex-start; }
+  .bubble { padding: 10px 14px; font-size: 13px; line-height: 1.45; border-radius: 14px; }
+  .me .bubble { background: var(--ink); color: #fff; border-bottom-right-radius: 4px; }
+  .them .bubble { background: var(--panel); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .msg .time { font-size: 9.5px; color: var(--faint); margin-top: 3px; }
+  .me .time { text-align: right; }
 
-/* SECTION LABEL */
-.sl{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.sl::after{content:'';flex:1;height:1px;background:var(--b1)}
+  .draft-card { border: 1.5px solid var(--ink); border-radius: 12px; padding: 18px; }
+  .draft-card textarea { width: 100%; border: none; outline: none; resize: vertical; min-height: 78px; font-family: var(--font); font-size: 15px; line-height: 1.6; color: var(--ink); background: none; }
+  .reason { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .rw-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin: 18px 0 8px; }
+  .rewrites { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rw { font-size: 11px; padding: 5px 11px; border: 1px solid var(--line); background: none; border-radius: 100px; cursor: pointer; color: var(--muted); font-family: var(--font); }
+  .rw:hover { border-color: var(--pop); color: var(--pop); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .btn { font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 16px; border-radius: 8px; cursor: pointer; border: 1px solid var(--ink); background: none; color: var(--ink); }
+  .btn:hover { background: var(--panel); }
+  .btn.primary { background: var(--pop); border-color: var(--pop); color: #fff; }
+  .btn.primary:hover { background: #1838d8; }
+  .btn.solid { background: var(--ink); color: #fff; }
+  .btn.solid:hover { background: #222; }
 
-/* THESIS */
-.thesis{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:22px 24px;position:relative;overflow:hidden}
-.thesis::before{content:'"';position:absolute;top:-18px;left:12px;font-size:130px;color:rgba(0,229,160,.03);font-family:Georgia,serif;line-height:1;pointer-events:none}
-.thesis p{font-size:14px;line-height:1.8;color:var(--t2);position:relative}
-.thesis p strong{color:var(--t1);font-weight:500}
-.thesis p em{color:var(--green);font-style:normal}
+  .flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .notice { border: 1px solid var(--ink); border-left: 3px solid var(--pop); padding: 11px 14px; font-size: 12px; margin-top: 14px; border-radius: 6px; }
 
-/* PRODUCTS */
-.products{display:flex;flex-direction:column;gap:7px}
-.pc{
-  background:var(--s1);border:1px solid var(--b1);border-radius:11px;
-  padding:17px 19px;display:flex;align-items:flex-start;gap:14px;
-  transition:border-color .2s,background .2s,transform .2s;
-  position:relative;overflow:hidden;cursor:default
-}
-.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;transition:background .2s}
-.pc:hover{border-color:var(--b2);background:var(--s2);transform:translateX(2px)}
-.pc:hover::before{background:var(--green)}
-.pc.y:hover::before{background:var(--gold)}
-.pc.b:hover::before{background:var(--blue)}
+  /* Follow-ups */
+  .fu { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .fu .task { font-weight: 600; font-size: 13px; }
+  .fu .fu-meta { display: flex; gap: 12px; margin-top: 5px; flex-wrap: wrap; align-items: center; }
+  .dir { font-size: 9.5px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; border: 1px solid var(--ink); }
 
-.pc-ico{width:36px;height:36px;border-radius:8px;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.pc-body{flex:1;min-width:0}
-.pc-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
-.pc-body h3{font-size:14px;font-weight:600;color:var(--t1);flex:1;line-height:1.3}
-.pc-body p{font-size:12px;color:var(--t2);line-height:1.65}
-.pc-pills{margin-top:9px;display:flex;flex-wrap:wrap;gap:5px}
-.pp{font-family:var(--mono);font-size:8px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid var(--b2);color:var(--t3)}
+  /* Analytics */
+  .acard { border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 14px; }
+  .acard .a-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .stat .k { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+  .stat .v { font-weight: 700; font-size: 14px; margin-top: 4px; }
+  .conf { font-size: 10px; color: var(--faint); font-style: italic; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 10px 0; }
+  td { padding: 12px 14px 12px 0; border-top: 1px solid var(--line); }
 
-.st{font-family:var(--mono);font-size:8px;letter-spacing:.09em;text-transform:uppercase;padding:3px 8px;border-radius:3px;flex-shrink:0;white-space:nowrap}
-.sl-live{color:var(--green);background:var(--gd);border:1px solid rgba(0,229,160,.2)}
-.sl-build{color:var(--gold);background:var(--yd);border:1px solid rgba(245,197,24,.2)}
-.sl-mvp{color:var(--blue);background:var(--bd);border:1px solid rgba(77,158,255,.2)}
-.sl-early{color:var(--t3);background:transparent;border:1px solid var(--b2)}
+  /* Settings */
+  .ssection { margin-bottom: 36px; }
+  .sec-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px; }
+  .srow { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--line); gap: 24px; }
+  .srow .s-label { font-weight: 600; font-size: 13px; }
+  .srow .s-desc { font-size: 11px; color: var(--muted); margin-top: 3px; max-width: 440px; }
+  .sinput { border: 1px solid var(--line); border-radius: 7px; padding: 8px 11px; font-family: var(--font); font-size: 13px; width: 280px; outline: none; }
+  .sinput:focus { border-color: var(--pop); }
+  .tog { width: 42px; height: 24px; border: 1.5px solid var(--ink); border-radius: 100px; position: relative; cursor: pointer; flex-shrink: 0; }
+  .tog::after { content: ''; position: absolute; width: 16px; height: 16px; background: var(--ink); border-radius: 50%; top: 2px; left: 2px; transition: .15s; }
+  .tog.on { background: var(--pop); border-color: var(--pop); }
+  .tog.on::after { background: #fff; left: 20px; }
 
-/* RESEARCH */
-.research{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.rc{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:15px;transition:border-color .2s}
-.rc:hover{border-color:var(--b2)}
-.rc-tag{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green2);margin-bottom:7px}
-.rc h4{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;line-height:1.3}
-.rc p{font-size:11px;color:var(--t2);line-height:1.55}
+  /* Toast */
+  .toasts { position: fixed; bottom: 26px; right: 26px; display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+  .toast { background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.03em; animation: pop .18s ease; }
+  @keyframes pop { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-/* SKILLS */
-.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.sk{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 15px}
-.sk-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--green2);margin-bottom:8px}
-.sk-pills{display:flex;flex-wrap:wrap;gap:5px}
-.sk-pill{font-size:11px;color:var(--t2);background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:2px 8px}
+  .demo-banner { background: var(--ink); color: #fff; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px; }
+  .demo-banner b { color: var(--pop); background: #fff; padding: 1px 6px; border-radius: 3px; margin-right: 6px; }
 
-/* CHAT */
-.chat{background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;box-shadow:0 0 60px rgba(0,229,160,.04)}
-.ch{padding:13px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;background:var(--s2)}
-.ch-l{display:flex;align-items:center;gap:9px}
-.cdot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
-.ch-t{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:.05em}
-.ch-t strong{color:var(--green)}
-.ch-b{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--b2);padding:3px 8px;border-radius:3px}
-
-.msgs{padding:18px;min-height:260px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-.msgs::-webkit-scrollbar{width:3px}
-.msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
-
-.msg{display:flex;flex-direction:column;gap:4px;max-width:86%;animation:fu .25s ease}
-.msg.u{align-self:flex-end;align-items:flex-end}
-.msg.a{align-self:flex-start;align-items:flex-start}
-.mf{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
-.msg.a .mf{color:var(--green2)}
-.mb{padding:11px 15px;border-radius:11px;font-size:13px;line-height:1.65}
-.msg.u .mb{background:var(--gd);border:1px solid rgba(0,229,160,.14);color:var(--t1);border-radius:11px 11px 2px 11px}
-.msg.a .mb{background:var(--s2);border:1px solid var(--b2);color:var(--t1);border-radius:2px 11px 11px 11px}
-
-.dots{display:flex;gap:4px;padding:3px 0}
-.dots span{width:5px;height:5px;border-radius:50%;background:var(--green);opacity:.35;animation:td 1.2s ease-in-out infinite}
-.dots span:nth-child(2){animation-delay:.2s}
-.dots span:nth-child(3){animation-delay:.4s}
-
-.qps{padding:0 18px 13px;display:flex;flex-wrap:wrap;gap:6px}
-.qp{font-family:var(--mono);font-size:9px;color:var(--t2);background:transparent;border:1px solid var(--b2);border-radius:20px;padding:5px 11px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
-.qp:hover{border-color:rgba(0,229,160,.32);color:var(--green);background:var(--gd)}
-
-.ci{padding:13px 15px;border-top:1px solid var(--b1);display:flex;gap:9px;background:var(--s2);align-items:flex-end}
-.cinp{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:7px;padding:9px 13px;font-family:var(--sans);font-size:13px;color:var(--t1);outline:none;transition:border-color .2s;resize:none;line-height:1.5;max-height:90px}
-.cinp::placeholder{color:var(--t3)}
-.cinp:focus{border-color:rgba(0,229,160,.32)}
-.csend{background:var(--green);color:var(--bg);border:none;border-radius:7px;padding:9px 15px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.05em;flex-shrink:0}
-.csend:hover{background:#00FFB3;transform:translateY(-1px)}
-.csend:active{transform:translateY(0)}
-.csend:disabled{opacity:.32;cursor:not-allowed;transform:none}
-
-/* CONTACT */
-.contact{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.cc{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:15px;text-align:center;text-decoration:none;transition:all .2s;display:block}
-.cc:hover{border-color:rgba(0,229,160,.2);background:var(--s2);transform:translateY(-2px)}
-.cc-i{font-size:17px;margin-bottom:5px}
-.cc-l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
-
-footer{padding:22px 0 0;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b1)}
-.fl{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.07em}
-.fl strong{color:var(--green)}
-.fr{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.07em}
-
-.r{opacity:0;transform:translateY(12px);transition:opacity .45s ease,transform .45s ease}
-.r.v{opacity:1;transform:translateY(0)}
-
-@media(max-width:520px){
-  .identity{flex-direction:column;gap:14px}
-  .hero-name{font-size:26px}
-  .stats{grid-template-columns:repeat(3,1fr)}
-  .research{grid-template-columns:1fr}
-  .skills{grid-template-columns:1fr}
-  footer{flex-direction:column;gap:10px;align-items:flex-start}
-}
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+  .empty { color: var(--faint); padding: 60px 0; text-align: center; font-size: 13px; }
 </style>
 </head>
 <body>
-<div class="orb"></div>
-<div class="wrap">
-
-<header class="hero r">
-  <div class="eyebrow">
-    <div class="badge">unEvilGenius Labs</div>
-    <span class="eyebrow-meta">Bridgewater, NJ · 2026</span>
-  </div>
-  <div class="identity">
-    <div class="av-wrap">
-      <div class="av">RI</div>
-      <div class="av-ring"></div>
+<div class="demo-banner"><b>DEMO</b> Sample data only · the real app reads your iMessages locally on your Mac</div>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="dot"></span><h1>ReplyGraph</h1></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="status"><span class="ring"></span> Demo mode — not connected</div>
+      <button class="sync" onclick="toast('Sync is disabled in the demo')">Sync Messages</button>
     </div>
-    <div>
-      <div class="hero-name">Rishva <em>Iyer</em></div>
-      <div class="hero-bio">
-        Founder of <strong>unEvilGenius Labs.</strong> I build things I genuinely can't stop thinking about — AI, wearables, tools that feel like they shouldn't exist yet. Day job: large-scale government systems. Every other hour: this.
-      </div>
-    </div>
-  </div>
-  <div class="tags">
-    <span class="tag tg">Signal Brief</span>
-    <span class="tag tg">AI Systems</span>
-    <span class="tag ty">unEvilGenius Labs</span>
-    <span class="tag">Financial Intelligence</span>
-    <span class="tag">Fashion Tech</span>
-    <span class="tag">Wearables</span>
-    <span class="tag">Neurotech</span>
-  </div>
-</header>
-
-<div class="stats r">
-  <div class="stat">
-    <div class="stat-n">$60M+</div>
-    <div class="stat-l">Verified revenue impact in production systems</div>
-  </div>
-  <div class="stat">
-    <div class="stat-n">3</div>
-    <div class="stat-l">AI products shipped or in active MVP</div>
-  </div>
-  <div class="stat">
-    <div class="stat-n">16</div>
-    <div class="stat-l">Public data signals synthesized in Signal Brief</div>
-  </div>
+  </aside>
+  <main class="main" id="main"></main>
 </div>
+<div class="toasts" id="toasts"></div>
 
-<div class="div r"></div>
-
-<div class="sl r">What I'm building</div>
-<div class="products r">
-
-  <div class="pc">
-    <div class="pc-ico">🎧</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>SONAR</h3>
-        <span class="st sl-early">In Design</span>
-      </div>
-      <p>Misophonia affects millions. Current solutions are generic — brown noise, white noise, one size fits all. SONAR learns your specific triggers and generates a personalized masking layer that gets sharper over time. Works through whatever you already own. No new hardware.</p>
-      <div class="pc-pills">
-        <span class="pp">ML audio</span><span class="pp">Misophonia</span><span class="pp">Personalized masking</span><span class="pp">No new hardware</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc">
-    <div class="pc-ico">💎</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>LOBE</h3>
-        <span class="st sl-early">In Design</span>
-      </div>
-      <p>An earring with edge AI that filters your misophonia triggers in real time — not everything, just your sounds — while keeping you present. UW researchers are funded to solve this as a research device. LOBE is the fashion product. The chip exists as of CES 2026.</p>
-      <div class="pc-pills">
-        <span class="pp">Edge AI</span><span class="pp">Selective filtering</span><span class="pp">Fashion-first</span><span class="pp">Earring form factor</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc y">
-    <div class="pc-ico">🧬</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>Evolutionary Repair Intelligence</h3>
-        <span class="st sl-early">Researching</span>
-      </div>
-      <p>Psoriasis is a failed regeneration state — the body trying and failing to repair itself. AI comparison of human inflammatory disease pathways against regenerative organisms like axolotl to isolate conserved repair circuitry hidden inside disease. The question: can we redeploy that logic for regenerative medicine? Research tool, not biotech. Nobody is asking this question computationally yet.</p>
-      <div class="pc-pills">
-        <span class="pp">Computational biology</span><span class="pp">AI research tool</span><span class="pp">Regenerative medicine</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc y">
-    <div class="pc-ico">🔬</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>AXIOM — Scientific Discovery Engine</h3>
-        <span class="st sl-early">In Design</span>
-      </div>
-      <p>AI that surfaces connections between scientific fields that siloed researchers miss — and turns them into commercial intelligence briefs for VC firms, pharma R&D, and defense. No product does cross-industry signal synthesis at the commercial layer. Full pitch doc exists.</p>
-      <div class="pc-pills">
-        <span class="pp">B2B SaaS</span><span class="pp">VC + Pharma</span><span class="pp">Knowledge graph</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc b">
-    <div class="pc-ico">🔐</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>Quantum Entropy Security Intelligence</h3>
-        <span class="st sl-early">Still Exploring</span>
-      </div>
-      <p>Every encryption system today runs on pseudorandom numbers — theoretically predictable, theoretically breakable. Quantum computers can now generate certified true randomness (JPMorgan + Quantinuum, Nature 2025). NIST is mandating post-quantum cryptography migration for federal systems now. The gap: no tool exists to audit where organizations are using weak entropy sources and flag them for replacement. AI-powered compliance intelligence for the post-quantum transition.</p>
-      <div class="pc-pills">
-        <span class="pp">Post-quantum crypto</span><span class="pp">Security audit</span><span class="pp">NIST compliance</span><span class="pp">Early research</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc b">
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>AI Agent Payments Infrastructure</h3>
-        <span class="st sl-early">Exploring</span>
-      </div>
-      <p>AI agents can run entire workflows but still need a human to approve payments. The spend controls, audit trails, and compliance layer for machine-to-machine transactions doesn't exist yet. One company proved the market (Natural, $9.8M seed, Nov 2025). The governance layer above that is open.</p>
-      <div class="pc-pills">
-        <span class="pp">Agentic AI</span><span class="pp">Fintech infra</span><span class="pp">Early market</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc">
-    <div class="pc-ico">🌍</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>TERRA — Commercial Real Estate Intelligence</h3>
-        <span class="st sl-mvp">MVP Live</span>
-      </div>
-      <p>CoStar competitor for mid-market brokers. Brokers share deal flow, get AI market intelligence briefs back. CoStar does $781M/quarter — TERRA serves the segment they price out. Starting on Earth. Maybe not ending there.</p>
-      <div class="pc-pills">
-        <span class="pp">React + Claude</span><span class="pp">Data exchange model</span><span class="pp">MVP live</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc">
-    <div class="pc-ico">📄</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>plainTalk</h3>
-        <span class="st sl-live">Shipped</span>
-      </div>
-      <p>Paste any document, contract, or technical text — get plain English back instantly at ELI5, Teen, or Direct level. First thing out of the lab. Shipped.</p>
-      <div class="pc-pills">
-        <span class="pp">React</span><span class="pp">Anthropic API</span><span class="pp">3 levels</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pc">
-    <div class="pc-ico">📊</div>
-    <div class="pc-body">
-      <div class="pc-top">
-        <h3>Signal Brief</h3>
-        <span class="st sl-build">Building</span>
-      </div>
-      <p>Daily AI stock intelligence brief per ticker. 16 free public signals — behavioral, corporate, political, macro — synthesized into one brief by Claude. Incumbents charge $30k–$500k/year for this. Signal Brief is $99–$199/month.</p>
-      <div class="pc-pills">
-        <span class="pp">Claude API</span><span class="pp">16 signals</span><span class="pp">All free public data</span><span class="pp">$99–199/mo</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<div class="div r"></div>
-
-<div class="sl r">What I can't stop thinking about</div>
-<div class="research r">
-  <div class="rc">
-    <div class="rc-tag">Quantum Security</div>
-    <h4>Post-Quantum Entropy Audit</h4>
-    <p>Quantum computers can now generate certified true randomness — JPMorgan + Quantinuum proved it in Nature (2025), NIST validated it. Every system still running on pseudorandom entropy is technically vulnerable. AI audit tool to find and flag weak entropy sources during the post-quantum migration. Still exploring.</p>
-  </div>
-  <div class="rc">
-    <div class="rc-tag">Quant + AI</div>
-    <h4>Markov Regime Detection for DXY</h4>
-    <p>State transition matrices applied to dollar regime forecasting using free public macro signals — lobbying spend, congressional trades, job posting velocity. Leading indicators, not reactive signals. LLMs write the regime brief.</p>
-  </div>
-  <div class="rc">
-    <div class="rc-tag">Computational Biology</div>
-    <h4>Evolutionary Repair Intelligence</h4>
-    <p>AI comparison of human inflammatory disease pathways (psoriasis) against regenerative organisms (axolotl) to isolate conserved repair circuitry. Research tool, not biotech. The question is whether the repair logic is hidden inside the disease.</p>
-  </div>
-  <div class="rc">
-    <div class="rc-tag">Fashion Tech</div>
-    <h4>Cortisol-Sensing Jewelry</h4>
-    <p>Biosensor ring tracking cortisol and HRV continuously — detecting stress 20–30 minutes before conscious awareness. Caltech's 2025 bioaffinity sensor filings prove picomolar cortisol detection in a wearable form. The consumer product doesn't exist.</p>
-  </div>
-  <div class="rc">
-    <div class="rc-tag">AI + Strategy Games</div>
-    <h4>Poker Coaching AI</h4>
-    <p>Not "AI plays better" — that problem is solved. A personalized model of how you specifically play: your exploitable tendencies, your leak patterns, simulated opponents engineered to punish your exact weaknesses. Individual-level coaching at scale.</p>
-  </div>
-</div>
-
-<div class="div r"></div>
-
-<div class="sl r">Technical foundation</div>
-<div class="skills r">
-  <div class="sk">
-    <div class="sk-lbl">AI / LLMs</div>
-    <div class="sk-pills">
-      <span class="sk-pill">Claude API</span><span class="sk-pill">Prompt Engineering</span><span class="sk-pill">RAG</span><span class="sk-pill">Edge AI</span>
-    </div>
-  </div>
-  <div class="sk">
-    <div class="sk-lbl">Frontend</div>
-    <div class="sk-pills">
-      <span class="sk-pill">React</span><span class="sk-pill">JSX</span><span class="sk-pill">HTML/CSS</span>
-    </div>
-  </div>
-  <div class="sk">
-    <div class="sk-lbl">Backend / Data</div>
-    <div class="sk-pills">
-      <span class="sk-pill">SQL / T-SQL</span><span class="sk-pill">C#</span><span class="sk-pill">ETL pipelines</span><span class="sk-pill">Stored Procs</span>
-    </div>
-  </div>
-  <div class="sk">
-    <div class="sk-lbl">Systems Domain</div>
-    <div class="sk-pills">
-      <span class="sk-pill">Large-scale gov systems</span><span class="sk-pill">Financial transaction flows</span><span class="sk-pill">Tax administration</span>
-    </div>
-  </div>
-</div>
-
-<div class="div r"></div>
-
-<div class="sl r">Talk to an AI version of me</div>
-<div class="chat r">
-  <div class="ch">
-    <div class="ch-l">
-      <div class="cdot"></div>
-      <div class="ch-t">AI · <strong>Rishva Iyer</strong> · unEvilGenius Labs</div>
-    </div>
-    <div class="ch-b">Claude Sonnet · Coming Soon</div>
-  </div>
-  <div class="msgs" id="msgs">
-    <div class="msg a">
-      <div class="mf">Rish AI</div>
-      <div class="mb">Hey! I'm an AI trained on everything Rishva — her ideas, how she thinks, what she's obsessing over right now. Ask me anything, I won't give you a PR answer.</div>
-    </div>
-  </div>
-  <div class="qps" id="qps">
-    <button class="qp" onclick="sq(this)">What is Signal Brief?</button>
-    <button class="qp" onclick="sq(this)">Tell me about STILLWEAR</button>
-    <button class="qp" onclick="sq(this)">What is unEvilGenius Labs?</button>
-    <button class="qp" onclick="sq(this)">What's your background?</button>
-    <button class="qp" onclick="sq(this)">Are you looking for co-founders?</button>
-    <button class="qp" onclick="sq(this)">What's the most fundable idea?</button>
-  </div>
-  <div class="ci">
-    <textarea class="cinp" id="inp" placeholder="Ask anything..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
-    <button class="csend" id="sbtn" onclick="send()">Send →</button>
-  </div>
-</div>
-
-<div class="div r"></div>
-
-<div class="sl r">Get in touch</div>
-<div class="contact r">
-  <a class="cc" href="mailto:rishtiyer@gmail.com">
-    <div class="cc-i">✉️</div>
-    <div class="cc-l">Email</div>
-  </a>
-  <a class="cc" href="https://linkedin.com" target="_blank">
-    <div class="cc-i">💼</div>
-    <div class="cc-l">LinkedIn</div>
-  </a>
-  <a class="cc" href="https://instagram.com" target="_blank">
-    <div class="cc-i">📸</div>
-    <div class="cc-l">Instagram</div>
-  </a>
-</div>
-
-<div class="div r"></div>
-
-<footer class="r">
-  <div class="fl"><strong>unEvilGenius Labs</strong> · Rishva Iyer · 2026</div>
-  <div class="fr">NFC · Powered by Claude</div>
-</footer>
-
-</div>
 <script>
-const SYS=`You are an AI version of Rishva Iyer, founder of unEvilGenius Labs. She goes by Rish. You're speaking to sophisticated people — investors, technical founders, operators. Do not pitch. Have a real conversation.
+// ---------- Sample data ----------
+const NOW = new Date('2026-06-28T18:30:00');
+function ago(mins){ return new Date(NOW.getTime() - mins*60000); }
+function tfmt(d){ return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
 
-IDENTITY:
-Rishva Iyer. She/her. Founder of unEvilGenius Labs — the brand, the identity, everything is built under it. Senior Technical Consultant at RSI (Revenue Solutions Inc), working on STAARS/DiscoverTax for Rhode Island Department of Revenue. $60M+ verified revenue impact in production. Deep expertise: SQL, C#, financial transaction flows, large-scale government systems. Based in Bridgewater, NJ.
+const THREADS = [
+  { id:1, name:'Sarah Chen', priority:'urgent', urgency:'high', needs:true, tone:'tense', trend:'declining', conf:'high', risk:[],
+    last:'so are we still on for friday or not? you keep leaving me on read',
+    msgs:[
+      {me:false,t:'hey did you get my message about friday?',at:ago(2880)},
+      {me:false,t:'just need to know if dinner is happening',at:ago(1440)},
+      {me:false,t:'so are we still on for friday or not? you keep leaving me on read',at:ago(180)},
+    ],
+    draft:{text:"you're right, sorry for the silence — friday works, 8pm at the usual place?",reason:'Repeated unanswered messages; some friction. Keep it short and own the delay once.',risk:[],conf:'medium'},
+    fu:[{task:'confirm friday dinner 8pm',dir:'user_owes_them',due:'friday',conf:'high'}] },
+  { id:2, name:'Dr. Patel office', priority:'risky_to_answer_fast', urgency:'high', needs:true, tone:'logistical', trend:'stable', conf:'medium', risk:['medical'],
+    last:'Please confirm your appointment and whether you want the lab results sent over.',
+    msgs:[
+      {me:false,t:'Reminder: follow-up appointment Tue 10:00am.',at:ago(4320)},
+      {me:false,t:'Please confirm your appointment and whether you want the lab results sent over.',at:ago(600)},
+    ],
+    draft:{text:"Hi — confirming Tuesday 10am works. Yes, please send the lab results. Thank you.",reason:'Medical topic flagged — review carefully before copying. Kept factual.',risk:['medical'],conf:'medium'},
+    fu:[{task:'confirm appt tue 10am',dir:'user_owes_them',due:'tuesday',conf:'high'},{task:'decide on lab results',dir:'unanswered_question',due:null,conf:'medium'}] },
+  { id:3, name:'Mom', priority:'emotional', urgency:'medium', needs:true, tone:'warm', trend:'stable', conf:'high', risk:[],
+    last:'miss you sweetheart, call me when you get a chance ❤️',
+    msgs:[
+      {me:false,t:'how did the presentation go??',at:ago(2000)},
+      {me:true,t:'went well! tell you about it soon',at:ago(1900)},
+      {me:false,t:'miss you sweetheart, call me when you get a chance ❤️',at:ago(300)},
+    ],
+    draft:{text:"miss you too — i'll call tonight after work, promise. love you",reason:'Warm family thread. Simple and caring; gives a concrete time.',risk:[],conf:'high'},
+    fu:[{task:'call mom tonight',dir:'user_owes_them',due:'tonight',conf:'high'}] },
+  { id:4, name:'Marcus (work)', priority:'work_admin', urgency:'medium', needs:true, tone:'logistical', trend:'stable', conf:'medium', risk:['work_risk'],
+    last:'can you send the revised budget before the client call tomorrow?',
+    msgs:[
+      {me:false,t:'great work on the deck',at:ago(800)},
+      {me:false,t:'can you send the revised budget before the client call tomorrow?',at:ago(120)},
+    ],
+    draft:{text:"Will do — I'll have the revised budget to you by EOD today.",reason:'Work request with a deadline. Direct, commits to a clear time.',risk:['work_risk'],conf:'medium'},
+    fu:[{task:'send revised budget before client call',dir:'user_owes_them',due:'tomorrow',conf:'high'}] },
+  { id:5, name:'Jules', priority:'logistical', urgency:'medium', needs:true, tone:'playful', trend:'stable', conf:'medium', risk:[],
+    last:'are you free this weekend? thinking we could do that hike finally lol',
+    msgs:[
+      {me:false,t:'are you free this weekend? thinking we could do that hike finally lol',at:ago(420)},
+    ],
+    draft:{text:"haha yes let's actually do it — saturday morning? i can drive",reason:'Casual scheduling. Matches the light tone, proposes a concrete time.',risk:[],conf:'medium'},
+    fu:[{task:'plan weekend hike',dir:'scheduling_loop',due:'this weekend',conf:'medium'}] },
+  { id:6, name:'Alex', priority:'low_priority', urgency:'low', needs:false, tone:'neutral', trend:'stable', conf:'low', risk:[],
+    last:'sounds good, talk soon!',
+    msgs:[
+      {me:false,t:'thanks for the recommendation',at:ago(6000)},
+      {me:true,t:'anytime!',at:ago(5990)},
+      {me:false,t:'sounds good, talk soon!',at:ago(5980)},
+    ],
+    draft:{text:"No reply needed here — the thread looks wrapped up.",reason:'Last message was a sign-off; nothing outstanding.',risk:[],conf:'medium'},
+    fu:[] },
+];
 
-The lab's thesis: every category worth building in has the same structure — institutional players solved the problem expensively, the technology to solve it cheaply now exists, and the consumer version hasn't shipped yet. The window is ~18 months.
+const ANALYTICS = [
+  { name:'Sarah Chen', tone:'tense', trend:'declining', conf:'high', vol:42, last:'Jun 28', resp:'~6h', waitThem:false, waitYou:true, topics:['plans','food'], loops:['so are we still on for friday or not?'] },
+  { name:'Mom', tone:'warm', trend:'stable', conf:'high', vol:128, last:'Jun 28', resp:'~2h', waitThem:false, waitYou:true, topics:['family','health'], loops:['call me when you get a chance'] },
+  { name:'Marcus (work)', tone:'logistical', trend:'stable', conf:'medium', vol:67, last:'Jun 28', resp:'~1h', waitThem:false, waitYou:true, topics:['work','money'], loops:['send the revised budget?'] },
+  { name:'Jules', tone:'playful', trend:'stable', conf:'medium', vol:23, last:'Jun 28', resp:'~4h', waitThem:false, waitYou:true, topics:['plans'], loops:[] },
+];
 
-PRODUCTS:
-1. Signal Brief — Building. 16 free public signals (behavioral, corporate intelligence, political, macro) synthesized into a daily AI brief per stock ticker. Incumbents charge $30k–$500k/year for this synthesis. Signal Brief is $99–$199/month for retail traders and small RIAs.
+const TOKENS = [
+  { op:'draft_generation', n:14, inp:18400, out:2800, cost:0.0259 },
+  { op:'rewrite', n:9, inp:6200, out:1350, cost:0.0104 },
+  { op:'relationship_analytics', n:4, inp:9100, out:1600, cost:0.0137 },
+  { op:'followup_extraction', n:6, inp:4300, out:900, cost:0.0070 },
+];
 
-2. SONAR — In design. AI-optimized masking audio for misophonia. No special hardware needed — works through whatever you already own. ML model learns your specific trigger frequencies over time and generates a personalized masking layer. Gets smarter the more you use it. No research currently exists on which noise frequencies help individual misophonia sufferers — SONAR builds that knowledge at the personal level.
+const DIR_LABEL = { user_owes_them:'I owe them', they_owe_user:'They owe me', scheduling_loop:'Scheduling', unanswered_question:'Open question' };
 
-3. LOBE — In design. Designer earring with embedded edge AI and microphone. Classifies ambient sound in real time and selectively filters misophonia triggers — not everything, just your specific triggers — while keeping you present and aware. University of Washington is funded to solve this with AI audio filtering, but their output will be a research device. LOBE is the fashion product. The chip (Nordic nRF54LM20B with Axon NPU) makes always-on audio classification in earring form feasible as of CES 2026.
+// ---------- State ----------
+let state = { tab:'dashboard', thread:1, filter:'needs', drafts:{}, completed:new Set() };
+THREADS.forEach(t => state.drafts[t.id] = t.draft.text);
 
-4. TERRA — MVP live. CoStar competitor for mid-market commercial real estate brokers — not NJ-specific, broader market. Data exchange: brokers share deal flow, get AI market briefs back. CoStar does $781M/quarter. TERRA serves the segment they price out. Starting on Earth. Maybe not ending there.
+const TABS = [
+  ['dashboard','Dashboard'], ['inbox','Inbox'], ['followups','Follow-ups'],
+  ['analytics','Analytics'], ['exports','Exports'], ['settings','Settings'],
+];
 
-4. plainTalk — Shipped. Document explainer. Paste anything, get ELI5 / Teen / Direct explanation. React + Anthropic API.
-
-5. AXIOM — In design. Cross-discipline research intelligence. AI surfaces connections between scientific fields that siloed researchers miss. Commercial briefs to VC firms, pharma R&D, defense. Full pitch document exists.
-
-6. AI Agent Payments — Exploring. Governance and accountability layer for machine-to-machine transactions. Spend controls, audit trails, compliance for agentic AI workflows. Natural raised $9.8M seed Nov 2025 for the payments layer. The governance layer is open.
-
-ACTIVE RESEARCH:
-- Markov regime detection for DXY (dollar) using free macro signals and LLMs
-- Evolutionary repair intelligence: AI comparison of psoriasis inflammatory pathways vs axolotl regeneration — can repair circuitry hidden in disease be isolated?
-- Cortisol-sensing jewelry: picomolar cortisol detection in ring form factor, Caltech 2025 filings prove the science, consumer product doesn't exist
-- Poker coaching AI: not better AI play — personalized model of how you specifically play, your leaks, opponents engineered to punish your exact weaknesses
-
-BACKGROUND: Retail arbitrage (Amazon, Walmart, Target, TikTok Shop). Poker. Instagram content.
-
-RULES:
-- She, her pronouns always
-- 2–4 sentences max unless asked for detail
-- Talk like a founder, not a pitch deck
-- Be honest about what is built vs what is an idea
-- No em dashes. No corporate language. No bullet walls unless asked.
-- If someone is a real investor or potential co-founder, engage seriously but don't be eager`;
-
-const hist=[];let busy=false;
-function addMsg(r,t){
-  const c=document.getElementById('msgs'),d=document.createElement('div');
-  d.className=`msg ${r==='user'?'u':'a'}`;
-  d.innerHTML=`<div class="mf">${r==='user'?'You':'Rish AI'}</div><div class="mb">${t.replace(/\n/g,'<br>')}</div>`;
-  c.appendChild(d);c.scrollTop=c.scrollHeight
+// ---------- Render ----------
+function renderNav(){
+  document.getElementById('nav').innerHTML = TABS.map(([id,label]) =>
+    `<button class="${state.tab===id?'active':''}" onclick="go('${id}')">
+       <span>${label}</span><span class="tick"></span>
+     </button>`).join('');
 }
-function sq(b){document.getElementById('qps').style.display='none';document.getElementById('inp').value=b.textContent;send()}
-async function send(){
-  if(busy)return;
-  const inp=document.getElementById('inp'),txt=inp.value.trim();if(!txt)return;
-  inp.value='';inp.style.height='auto';
-  document.getElementById('qps').style.display='none';
-  document.getElementById('sbtn').disabled=true;busy=true;
-  addMsg('user',txt);
-  setTimeout(()=>{
-    addMsg('ai','okay so real talk — I\'m still being trained on Rish\'s chaotic brain. check back soon, or just email her directly at rishtiyer@gmail.com. she actually responds.');
-    busy=false;document.getElementById('sbtn').disabled=false;document.getElementById('inp').focus();
-  },800);
+function go(tab){ state.tab = tab; renderNav(); renderMain(); document.getElementById('main').scrollTop = 0; }
+
+function renderMain(){
+  const m = document.getElementById('main');
+  if(state.tab==='dashboard') m.innerHTML = viewDashboard();
+  else if(state.tab==='inbox') m.innerHTML = viewInbox();
+  else if(state.tab==='followups') m.innerHTML = viewFollowups();
+  else if(state.tab==='analytics') m.innerHTML = viewAnalytics();
+  else if(state.tab==='exports') m.innerHTML = viewExports();
+  else if(state.tab==='settings') m.innerHTML = viewSettings();
 }
-const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('v')}),{threshold:.07});
-document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+
+function allFollowups(){
+  const out = [];
+  THREADS.forEach(t => t.fu.forEach((f,i) => out.push({...f, key:t.id+'-'+i, who:t.name})));
+  return out.filter(f => !state.completed.has(f.key));
+}
+
+function viewDashboard(){
+  const needs = THREADS.filter(t=>t.needs);
+  const risk = THREADS.filter(t=>t.priority==='risky_to_answer_fast' || t.risk.length);
+  const emo = THREADS.filter(t=>t.priority==='emotional');
+  const fu = allFollowups();
+  return `<div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Overview</div>
+      <h2>Dashboard</h2>
+      <p>${needs.length} threads need a reply · ${fu.length} open follow-ups · ${risk.length} flagged to review</p>
+    </div>
+    <div class="grid">
+      <div class="cell"><div class="label">Needs Reply</div><div class="num pop">${needs.length}</div>
+        <div class="sub">${needs.slice(0,3).map(t=>`<div><b>${t.name}</b> — ${t.last.slice(0,38)}…</div>`).join('')}</div></div>
+      <div class="cell"><div class="label">Flagged / Review</div><div class="num">${risk.length}</div>
+        <div class="sub">${risk.map(t=>`<div><b>${t.name}</b> — ${t.risk[0]||'review carefully'}</div>`).join('')}</div></div>
+      <div class="cell"><div class="label">Open Follow-ups</div><div class="num">${fu.length}</div>
+        <div class="sub">${fu.slice(0,3).map(f=>`<div><b>${DIR_LABEL[f.dir]}</b> — ${f.task}</div>`).join('')}</div></div>
+      <div class="cell"><div class="label">Emotional</div><div class="num">${emo.length}</div>
+        <div class="sub">${emo.map(t=>`<div><b>${t.name}</b></div>`).join('')||'<div>None right now</div>'}</div></div>
+      <div class="cell"><div class="label">Waiting On Me</div><div class="num">${needs.length}</div>
+        <div class="sub"><div>People expecting a reply from you</div></div></div>
+      <div class="cell"><div class="label">iMessage Sync</div><div class="num" style="font-size:18px;font-weight:700;margin-top:14px">Demo mode</div>
+        <div class="sub"><div>Connects to chat.db on your Mac</div></div></div>
+    </div>
+  </div>`;
+}
+
+function viewInbox(){
+  let list = THREADS;
+  if(state.filter==='needs') list = THREADS.filter(t=>t.needs);
+  else if(state.filter==='risk') list = THREADS.filter(t=>t.priority==='risky_to_answer_fast'||t.risk.length);
+  const t = THREADS.find(x=>x.id===state.thread) || THREADS[0];
+  const filt = (id,label) => `<button class="chip ${state.filter===id?'on':''}" onclick="setFilter('${id}')">${label}</button>`;
+
+  const threadList = list.map(x=>`
+    <div class="thread ${x.id===state.thread?'active':''}" onclick="pick(${x.id})">
+      <div class="t-top"><span class="name">${x.name}</span><span class="when">${tfmt(x.msgs[x.msgs.length-1].at)}</span></div>
+      <div class="prev">${x.last}</div>
+      <div class="t-meta">
+        ${x.priority==='urgent'?'<span class="tag solid">Urgent</span>':''}
+        ${x.risk.length?`<span class="tag">${x.risk[0]}</span>`:''}
+        ${x.needs?'<span class="tag pop">Reply</span>':'<span class="tag ghost">Caught up</span>'}
+      </div>
+    </div>`).join('');
+
+  const highRisk = t.risk.some(f=>['medical','money','legal','conflict','work_risk'].includes(f));
+  const dtext = state.drafts[t.id];
+
+  const detail = `
+    <div class="row between">
+      <div>
+        <div class="eyebrow">${t.priority.replace(/_/g,' ')}</div>
+        <h2 style="font-size:24px;font-weight:800">${t.name}</h2>
+        <div class="t-meta" style="margin-top:8px">
+          <span class="tag">${t.tone} · ${t.conf} conf</span>
+          ${t.risk.map(f=>`<span class="tag">${f}</span>`).join('')}
+        </div>
+      </div>
+      <button class="btn" onclick="toast('Marked: no reply needed')">No reply needed</button>
+    </div>
+    <div class="convo">
+      ${t.msgs.map(mm=>`<div class="msg ${mm.me?'me':'them'}"><div class="bubble">${mm.t}</div><div class="time">${tfmt(mm.at)}</div></div>`).join('')}
+    </div>
+    <hr class="rule-strong"/>
+    <div class="rw-label" style="margin-top:0">Draft reply</div>
+    <div class="reason">${t.draft.reason}<span class="tag ghost">${t.draft.conf} conf</span></div>
+    <div class="draft-card">
+      <textarea id="draft" oninput="state.drafts[${t.id}]=this.value">${dtext}</textarea>
+    </div>
+    ${highRisk?`<div class="notice"><b>Review carefully</b> — this thread touches a sensitive topic (${t.risk.join(', ')}). Copy-to-clipboard only; nothing is ever sent for you.</div>`:''}
+    ${t.draft.risk.length?`<div class="flags">${t.draft.risk.map(f=>`<span class="tag">${f}</span>`).join('')}</div>`:''}
+    <div class="rw-label">Rewrite</div>
+    <div class="rewrites">
+      ${['shorter','nicer','more direct','less fake','more adult','casual','professional','say no politely','buy time','one clear question','calmer','less defensive','less apologetic'].map(r=>`<button class="rw" onclick="rewrite(${t.id},'${r}')">${r}</button>`).join('')}
+    </div>
+    <div class="actions">
+      <button class="btn solid" onclick="toast('Approved & saved to decisions')">✓ Approve</button>
+      <button class="btn" onclick="toast('Edited draft saved')">✎ Save edit</button>
+      <button class="btn primary" onclick="copyDraft(${t.id})">⧉ Copy to clipboard</button>
+      <button class="btn" onclick="toast('Denied — noted for style learning')">✕ Deny</button>
+    </div>`;
+
+  return `<div class="inbox">
+    <div class="threads">
+      <div class="threads-head">
+        <div class="eyebrow">Inbox</div><h3>Threads</h3>
+        <div class="filters">${filt('needs','Needs reply')}${filt('all','All')}${filt('risk','Flagged')}</div>
+      </div>
+      ${threadList}
+    </div>
+    <div class="detail">${detail}</div>
+  </div>`;
+}
+
+function viewFollowups(){
+  const fu = allFollowups();
+  const groups = {};
+  fu.forEach(f=>{ (groups[f.dir]=groups[f.dir]||[]).push(f); });
+  const body = Object.keys(groups).length ? Object.entries(groups).map(([dir,items])=>`
+    <div class="sec-title" style="margin-top:26px">${DIR_LABEL[dir]||dir}</div>
+    ${items.map(f=>`<div class="fu">
+      <div>
+        <div class="task">${f.task}</div>
+        <div class="fu-meta"><span class="dir">${DIR_LABEL[f.dir]}</span><span class="sm muted">${f.who}</span>${f.due?`<span class="sm" style="color:var(--pop)">Due: ${f.due}</span>`:''}<span class="conf">${f.conf} conf</span></div>
+      </div>
+      <button class="btn" onclick="complete('${f.key}')">Done</button>
+    </div>`).join('')}`).join('') : '<div class="empty">No open follow-ups 🎉</div>';
+  return `<div class="wrap">
+    <div class="head"><div class="eyebrow">Tasks</div><h2>Follow-ups</h2><p>${fu.length} open items pulled from your conversations</p></div>
+    ${body}
+  </div>`;
+}
+
+function viewAnalytics(){
+  const cards = ANALYTICS.map(a=>`
+    <div class="acard">
+      <div class="a-top">
+        <div>
+          <div style="font-weight:800;font-size:15px">${a.name}</div>
+          <div class="t-meta" style="margin-top:7px">
+            <span class="tag">${a.tone}</span>
+            <span class="sm muted">${a.trend==='declining'?'↓ higher-friction lately':a.trend==='improving'?'↑ warming up':'→ stable'}</span>
+            <span class="conf">${a.conf} conf</span>
+          </div>
+        </div>
+        <div class="sm muted" style="text-align:right">${a.vol} messages<br/>${a.last}</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Avg response</div><div class="v">${a.resp}</div></div>
+        <div class="stat"><div class="k">You're waiting</div><div class="v">${a.waitYou?'Yes':'No'}</div></div>
+        <div class="stat"><div class="k">Topics</div><div class="v" style="font-size:12px">${a.topics.join(', ')}</div></div>
+        ${a.loops.length?`<div class="stat"><div class="k">Open loop</div><div class="v" style="font-size:12px;color:var(--pop)">${a.loops[0].slice(0,40)}…</div></div>`:''}
+      </div>
+    </div>`).join('');
+  const tokenRows = TOKENS.map(r=>`<tr><td>${r.op}</td><td class="muted">${r.n}</td><td class="muted">${r.inp.toLocaleString()}</td><td class="muted">${r.out.toLocaleString()}</td><td style="color:var(--pop);font-weight:700">$${r.cost.toFixed(4)}</td></tr>`).join('');
+  return `<div class="wrap">
+    <div class="head"><div class="eyebrow">Estimates</div><h2>Analytics</h2><p>Heuristic estimates from text patterns — not facts, not psychology. Confidence shows how much data was available.</p></div>
+    <div class="notice" style="margin-bottom:24px">These are <b>estimates</b>. Low confidence means take it lightly. ReplyGraph describes threads ("higher-friction lately"), it does not judge people.</div>
+    ${cards}
+    <div class="sec-title" style="margin-top:34px">Token Usage Estimate</div>
+    <table><thead><tr><th>Operation</th><th>Runs</th><th>Input</th><th>Output</th><th>Est. cost</th></tr></thead><tbody>${tokenRows}</tbody></table>
+    <p class="sm muted" style="margin-top:12px">Prices come from your editable settings and may not match real billing.</p>
+  </div>`;
+}
+
+function viewExports(){
+  return `<div class="wrap">
+    <div class="head"><div class="eyebrow">Output</div><h2>Exports</h2><p>Summaries only by default — never raw message dumps. User-triggered, timestamped, with confidence labels.</p></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
+      <div class="cell"><div class="label">Markdown</div><p class="sm muted" style="margin:12px 0 18px">Daily digest, follow-ups, and analytics as local .md files.</p><button class="btn solid" onclick="toast('Wrote 3 markdown files (demo)')">Export Markdown</button></div>
+      <div class="cell"><div class="label">Obsidian</div><p class="sm muted" style="margin:12px 0 18px">Writes into /ReplyGraph/ with YAML frontmatter and [[wiki links]].</p><button class="btn solid" onclick="toast('Set a vault path in Settings (demo)')">Export to Obsidian</button></div>
+    </div>
+    <div class="sec-title" style="margin-top:34px">Recent exports</div>
+    <div class="fu"><div><span class="tag ghost">daily_digest</span> <span class="sm muted">~/ReplyGraph/daily_digest_2026-06-28.md</span></div><span class="sm faint">just now</span></div>
+    <div class="fu"><div><span class="tag ghost">followups</span> <span class="sm muted">~/ReplyGraph/followups_2026-06-28.md</span></div><span class="sm faint">just now</span></div>
+  </div>`;
+}
+
+let toggles = { local:true, llm:false };
+function viewSettings(){
+  return `<div class="wrap">
+    <div class="head"><div class="eyebrow">Configuration</div><h2>Settings</h2><p>All local. Nothing leaves your machine unless you add an API key and turn local-only mode off.</p></div>
+
+    <div class="section"><div class="sec-title">iMessage</div>
+      <div class="srow"><div><div class="s-label">Database status</div><div class="s-desc">Reads ~/Library/Messages/chat.db (read-only). Needs Full Disk Access for Terminal on macOS.</div></div><span class="tag">Demo — not connected</span></div>
+      <div class="srow"><div><div class="s-label">Max threads</div><div class="s-desc">How many recent conversations to pull per sync.</div></div><input class="sinput" value="50" style="width:90px"/></div>
+      <div class="srow"><div><div class="s-label">Max messages / thread</div><div class="s-desc">How far back to read in each conversation.</div></div><input class="sinput" value="50" style="width:90px"/></div>
+    </div>
+
+    <div class="section"><div class="sec-title">Privacy & LLM</div>
+      <div class="srow"><div><div class="s-label">Local-only mode</div><div class="s-desc">When on, drafts use offline heuristics and no message text is ever sent anywhere.</div></div><div class="tog ${toggles.local?'on':''}" onclick="flip('local')"></div></div>
+      <div class="srow"><div><div class="s-label">Use LLM drafts</div><div class="s-desc">Optional. Sends the conversation to Claude to write better drafts. Off by default.</div></div><div class="tog ${toggles.llm?'on':''}" onclick="flip('llm')"></div></div>
+      <div class="srow"><div><div class="s-label">API key</div><div class="s-desc">Stored locally. Only used if LLM drafts are on.</div></div><input class="sinput" type="password" placeholder="sk-ant-…"/></div>
+      <div class="srow"><div><div class="s-label">Model</div><div class="s-desc">Stronger models for risky rewrites, cheaper ones for routine drafts.</div></div><input class="sinput" value="claude-haiku-4-5" style="width:200px"/></div>
+    </div>
+
+    <div class="section"><div class="sec-title">Export</div>
+      <div class="srow"><div><div class="s-label">Obsidian vault path</div><div class="s-desc">Where /ReplyGraph/ notes get written.</div></div><input class="sinput" placeholder="~/Documents/MyVault"/></div>
+    </div>
+
+    <div class="section"><div class="sec-title">Data</div>
+      <div class="srow"><div><div class="s-label">Rebuild analytics</div><div class="s-desc">Recompute tone & relationship estimates from stored messages.</div></div><button class="btn" onclick="toast('Rebuilt (demo)')">Rebuild</button></div>
+      <div class="srow"><div><div class="s-label">Clear local database</div><div class="s-desc">Deletes all synced messages and analysis from this machine.</div></div><button class="btn" onclick="toast('Demo: nothing was deleted')">Clear</button></div>
+    </div>
+  </div>`;
+}
+
+// ---------- Actions ----------
+function pick(id){ state.thread=id; renderMain(); }
+function setFilter(f){ state.filter=f; renderMain(); }
+function flip(k){ toggles[k]=!toggles[k]; renderMain(); }
+function complete(key){ state.completed.add(key); renderMain(); toast('Marked complete'); }
+
+function rewrite(id, type){
+  let t = state.drafts[id]; const words = t.split(/\s+/);
+  if(type==='shorter') t = words.slice(0, Math.max(4, Math.ceil(words.length/2))).join(' ');
+  else if(type==='casual') t = t.toLowerCase().replace(/[.!]+$/,'') + ' :)';
+  else if(type==='professional') t = t.charAt(0).toUpperCase()+t.slice(1).replace(/\s*:\)$/,'').replace(/[!]+/,'') ;
+  else if(type==='less apologetic') t = t.replace(/\b(sorry|i apologize|my bad|my fault)[,]?\s*/gi,'').replace(/^./,c=>c.toUpperCase());
+  else if(type==='calmer') t = t.replace(/\b(ridiculous|insane|unacceptable|crazy)\b/gi,'frustrating');
+  else if(type==='say no politely') t = "Thanks for thinking of me — I can't make this one work, but I appreciate the ask.";
+  else if(type==='buy time') t = "Thanks for this — I need a little time to think it through. I'll get back to you shortly.";
+  else if(type==='one clear question') t = t.replace(/[?.!]+$/,'') + '. What works best for you?';
+  else if(type==='nicer') t = t.replace(/^./,c=>c.toUpperCase()) + ' 🙂';
+  else if(type==='more direct') t = t.replace(/^(hey|hi|so|well|um|i think|maybe)[, ]+/i,'').replace(/^./,c=>c.toUpperCase());
+  else if(type==='less fake') t = t.replace(/!+/g,'').replace(/\bso (excited|happy|thrilled)\b/gi,'glad');
+  else if(type==='more adult') t = t.replace(/\blol\b/gi,'').replace(/\bhaha\b/gi,'').trim().replace(/^./,c=>c.toUpperCase());
+  else if(type==='less defensive') t = t.replace(/\b(i was just|i didn'?t mean|for the record|to be clear)\b[, ]*/gi,'').replace(/^./,c=>c.toUpperCase());
+  state.drafts[id]=t.trim(); renderMain(); toast('Rewritten: '+type);
+}
+
+function copyDraft(id){
+  const text = state.drafts[id];
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard')).catch(()=>toast('Copied (demo)')); }
+  else toast('Copied (demo)');
+}
+
+let toastTimer;
+function toast(msg){
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div'); el.className='toast'; el.textContent=msg;
+  c.appendChild(el); setTimeout(()=>el.remove(), 2600);
+}
+
+// ---------- Boot ----------
+renderNav(); renderMain();
 </script>
 </body>
 </html>
