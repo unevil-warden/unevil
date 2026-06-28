@@ -212,9 +212,59 @@
   ::-webkit-scrollbar-thumb { background: #dadadf; border-radius: 5px; border: 2px solid var(--bg); }
   ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 
-  @media (max-width: 860px) {
-    .stat-row { grid-template-columns: repeat(2, 1fr); }
-    .dash-cols { grid-template-columns: 1fr; }
+  .mobile-nav { display: none; }
+  .mobile-back { display: none; }
+
+  @media (max-width: 760px) {
+    .app { flex-direction: column; height: auto; min-height: 100vh; overflow: visible; }
+    .side { display: none; }
+    .main { height: auto; min-height: 100vh; padding-bottom: 76px; }
+    .topbar { padding: 9px 16px; font-size: 11px; line-height: 1.4; }
+    .wrap { max-width: 100%; padding: 22px 16px 44px; }
+    .head { margin-bottom: 20px; }
+    .head h2 { font-size: 23px; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+    .tile { padding: 15px; }
+    .tile .n { font-size: 30px; margin-top: 8px; }
+    .dash-cols { grid-template-columns: 1fr; gap: 14px; }
+
+    /* Inbox becomes single column with list <-> detail */
+    .inbox { grid-template-columns: 1fr; height: auto; }
+    .threads { border-right: none; }
+    .threads-head { position: static; }
+    .detail { padding: 18px 16px 44px; }
+    .inbox.show-list .detail { display: none; }
+    .inbox.show-detail .threads { display: none; }
+    .mobile-back { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 14px; padding: 7px 12px; }
+    .convo { max-height: none; }
+    .d-head { flex-wrap: wrap; gap: 10px; }
+    .d-head h2 { font-size: 20px; }
+    .actions { gap: 8px; }
+    .actions .btn { flex: 1 1 calc(50% - 8px); }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+
+    /* Native-style bottom tab bar */
+    .mobile-nav {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(16px) saturate(1.3);
+      border-top: 1px solid var(--line);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    }
+    .mobile-nav button {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; cursor: pointer; padding: 5px 2px;
+      font-family: var(--font); font-size: 9.5px; font-weight: 600; color: var(--faint);
+    }
+    .mobile-nav button span { white-space: nowrap; }
+    .mobile-nav button .ic { width: 21px; height: 21px; opacity: .55; }
+    .mobile-nav button.active { color: var(--pop); }
+    .mobile-nav button.active .ic { opacity: 1; }
+  }
+
+  @media (max-width: 400px) {
+    .stat-row { gap: 8px; }
+    .tile .n { font-size: 27px; }
+    .mobile-nav button { font-size: 9px; }
   }
 </style>
 </head>
@@ -230,6 +280,7 @@
   </aside>
   <main class="main" id="main"></main>
 </div>
+<nav class="mobile-nav" id="mnav"></nav>
 <div class="toasts" id="toasts"></div>
 
 <script>
@@ -323,7 +374,8 @@ const TOKENS = [
 const DIR_LABEL = { user_owes_them:'I owe them', they_owe_user:'They owe me', scheduling_loop:'Scheduling', unanswered_question:'Open question' };
 
 // ---------- State ----------
-let state = { tab:'dashboard', thread:1, filter:'needs', drafts:{}, completed:new Set() };
+let state = { tab:'dashboard', thread:1, filter:'needs', drafts:{}, completed:new Set(), inboxPane:'list' };
+const MTAB = { dashboard:'Home', inbox:'Inbox', followups:'Tasks', analytics:'Stats', exports:'Export', settings:'Settings' };
 THREADS.forEach(t => state.drafts[t.id] = t.draft.text);
 let toggles = { local:true, llm:false };
 
@@ -336,8 +388,10 @@ const TABS = [
 function renderNav(){
   document.getElementById('nav').innerHTML = TABS.map(([id,label]) =>
     `<button class="${state.tab===id?'active':''}" onclick="go('${id}')">${IC[id]}<span>${label}</span></button>`).join('');
+  document.getElementById('mnav').innerHTML = TABS.map(([id,label]) =>
+    `<button class="${state.tab===id?'active':''}" onclick="go('${id}')">${IC[id]}<span>${MTAB[id]||label}</span></button>`).join('');
 }
-function go(tab){ state.tab = tab; renderNav(); renderMain(); document.getElementById('main').scrollTop = 0; }
+function go(tab){ state.tab = tab; if(tab==='inbox') state.inboxPane='list'; renderNav(); renderMain(); document.getElementById('main').scrollTop = 0; window.scrollTo(0,0); }
 function renderMain(){
   const m = document.getElementById('main');
   const views = { dashboard:viewDashboard, inbox:viewInbox, followups:viewFollowups, analytics:viewAnalytics, exports:viewExports, settings:viewSettings };
@@ -414,6 +468,7 @@ function viewInbox(){
   const highRisk = t.risk.some(f=>['medical','money','legal','conflict','work_risk'].includes(f));
   const dtext = state.drafts[t.id];
   const detail = `
+    <button class="mobile-back btn" onclick="backToList()">‹ All threads</button>
     <div class="d-head">
       <div>
         <div class="eyebrow">${t.priority.replace(/_/g,' ')}</div>
@@ -444,7 +499,7 @@ function viewInbox(){
       <button class="btn primary" onclick="copyDraft(${t.id})">Copy to clipboard</button>
       <button class="btn" onclick="toast('Denied — noted for style learning')">Deny</button>
     </div>`;
-  return `<div class="inbox">
+  return `<div class="inbox ${state.inboxPane==='detail'?'show-detail':'show-list'}">
     <div class="threads">
       <div class="threads-head">
         <div class="eyebrow">Inbox</div><h3>Threads</h3>
@@ -547,7 +602,8 @@ function viewSettings(){
 }
 
 // ---------- Actions ----------
-function pick(id){ state.thread=id; renderMain(); }
+function pick(id){ state.thread=id; state.inboxPane='detail'; renderMain(); }
+function backToList(){ state.inboxPane='list'; renderMain(); }
 function setFilter(f){ state.filter=f; renderMain(); }
 function flip(k){ toggles[k]=!toggles[k]; renderMain(); }
 function complete(key){ state.completed.add(key); renderMain(); toast('Marked complete'); }
