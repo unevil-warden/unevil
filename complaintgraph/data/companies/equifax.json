@@ -259,5 +259,43 @@
       }
     ]
   },
-  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,815 complaints about Equifax. Volume is steady (last 3 months averaged 131 per month versus 129 before). The most common issue is \"Incorrect information on your report\" (46% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 98% of cases; 88.1% of closed cases ended without relief. Overall risk signal: Elevated (57/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion."
+  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,815 complaints about Equifax. Volume is steady (last 3 months averaged 131 per month versus 129 before). The most common issue is \"Incorrect information on your report\" (46% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 98% of cases; 88.1% of closed cases ended without relief. Overall risk signal: Elevated (57/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion.",
+  "regulatory": {
+    "data_source": "sample",
+    "fdic": null,
+    "sec": {
+      "cik": "0000033185",
+      "entity_name": "EQUIFAX INC",
+      "recent_filings": [
+        {
+          "form": "10-K",
+          "date": "2026-02-25",
+          "primary_doc": "efx-20251231.htm"
+        },
+        {
+          "form": "8-K",
+          "date": "2026-04-16",
+          "primary_doc": "efx-8k.htm"
+        }
+      ]
+    },
+    "lei": {
+      "lei": "L13RU0RZ8NU6RWFW1Y26",
+      "legal_name": "Equifax Inc.",
+      "jurisdiction": "US-GA",
+      "status": "ACTIVE",
+      "registration_status": "ISSUED"
+    },
+    "sources": [
+      {
+        "label": "SEC EDGAR",
+        "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany"
+      },
+      {
+        "label": "GLEIF LEI Search",
+        "url": "https://search.gleif.org/"
+      }
+    ],
+    "note": "SAMPLE public-record cross-reference — synthetic, illustrative values for offline demo. Replaced by live FDIC / SEC EDGAR / GLEIF lookups when ingested in CI."
+  }
 }

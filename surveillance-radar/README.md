@@ -29,6 +29,32 @@ not affiliated with or endorsed by EFF.
 **Absence of a marker does not mean absence of surveillance.** It may only mean an area has not
 been researched yet or the data has not been updated.
 
+### Additional open-data cross-reference layers
+
+Two optional, **toggleable** layers (off by default) let you cross-reference the EFF deployments
+against other public open datasets. Each is ingested at build time and baked to a static file in
+`public/` — no runtime API dependency — exactly like the Atlas. Both ship with a small,
+clearly-labeled **sample file** so they render offline; the ingest scripts overwrite those files
+with live results when network is available. They are styled distinctly from the cyan EFF points
+and are toggled from the "Cross-reference layers" panel (top-right).
+
+| Layer | Source | Ingest | Static file | Marker | Attribution |
+|-------|--------|--------|-------------|--------|-------------|
+| OSM surveillance | OpenStreetMap via Overpass API (`node["man_made"="surveillance"]`, bounded to a small Washington, D.C. bbox) | `pnpm ingest:osm` | `public/osm-surveillance.geojson` | amber | © OpenStreetMap contributors (ODbL) |
+| Wikidata agencies | Wikidata SPARQL (law-enforcement agencies, `wdt:P31/P279* wd:Q1414557`, with coordinates `P625`) | `pnpm ingest:wikidata` | `public/wikidata-agencies.geojson` | violet | Wikidata (CC0) |
+
+```bash
+pnpm ingest:osm        # overwrites public/osm-surveillance.geojson (keeps sample if offline)
+pnpm ingest:wikidata   # overwrites public/wikidata-agencies.geojson (keeps sample if offline)
+```
+
+Both ingest scripts use a bounded query + timeout and are **non-fatal on network failure**: if the
+endpoint is blocked or rate-limited they keep the committed sample file so the build always has
+data. The static files are loaded through the same `NEXT_PUBLIC_BASE_PATH` mechanism as
+`public/world.geojson`, so the layers work when served from a subpath (e.g. GitHub Pages).
+
+> These layers are independent open datasets, not part of — nor endorsed by — the EFF Atlas.
+
 ## How to use the real Atlas dataset
 
 The app ships with a small, clearly-labeled **demo dataset** (`data/raw/sample-atlas.csv`) so it
@@ -104,15 +130,20 @@ surveillance-radar/
     MapExperience.tsx      # state + composition
     map/Globe.tsx          # MapLibre globe, spin, clustering, glow, click→drawer
     map/Controls.tsx       # search + filters
+    map/LayerToggles.tsx   # toggle the OSM / Wikidata cross-reference layers
     map/RecordDrawer.tsx   # detail panel
     layout/Footer.tsx      # disclaimer + attribution
   lib/atlas/               # schema (Zod), normalize, geocode, search, filters, theme
-  scripts/ingest-atlas.ts  # CSV -> normalized, geocoded, validated JSON
+  scripts/ingest-atlas.ts     # CSV -> normalized, geocoded, validated JSON
+  scripts/ingest-osm.ts       # Overpass -> public/osm-surveillance.geojson
+  scripts/ingest-wikidata.ts  # SPARQL -> public/wikidata-agencies.geojson
   data/
     raw/                   # drop the real atlas-of-surveillance.csv here
     centroids/             # bundled offline centroid table
     processed/             # generated app data (committed)
-  public/world.geojson     # bundled land outlines (no tile server needed)
+  public/world.geojson              # bundled land outlines (no tile server needed)
+  public/osm-surveillance.geojson   # OSM surveillance nodes (sample committed; ODbL)
+  public/wikidata-agencies.geojson  # Wikidata agencies (sample committed; CC0)
 ```
 
 ## Extracting into its own repository

@@ -1,0 +1,83 @@
+{
+  "slug": "lodash",
+  "name": "lodash",
+  "display_name": "lodash",
+  "ecosystem": "npm",
+  "repo": "lodash/lodash",
+  "data_source": "sample",
+  "snapshot_date": "2026-06-29",
+  "facts": {
+    "scorecard": {
+      "score": 6.2
+    },
+    "vulns": {
+      "count": 1,
+      "max_severity": "HIGH"
+    },
+    "maintenance": {
+      "last_release_days": 985,
+      "last_commit_days": 116,
+      "releases_past_year": 1
+    },
+    "bus_factor": {
+      "top_share": 0.61,
+      "contributors": 330
+    },
+    "license": {
+      "spdx_id": "MIT"
+    }
+  },
+  "signal": {
+    "score": 46,
+    "health_score": 54,
+    "band": "Moderate",
+    "components": [
+      {
+        "key": "security_posture",
+        "label": "Security posture",
+        "weight": 0.25,
+        "value": 38,
+        "evidence": "OpenSSF Scorecard 6.2/10 → inverted to 38/100 risk",
+        "source": "OpenSSF Scorecard (via deps.dev)",
+        "confidence": "high"
+      },
+      {
+        "key": "known_vulns",
+        "label": "Known vulnerabilities",
+        "weight": 0.25,
+        "value": 60.8,
+        "evidence": "1 known advisory in OSV (max severity HIGH)",
+        "source": "OSV.dev",
+        "confidence": "high"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance / activity",
+        "weight": 0.2,
+        "value": 60.1,
+        "evidence": "985d since last release, 116d since last commit, 1 releases in the past year",
+        "source": "ecosyste.ms / GitHub",
+        "confidence": "high"
+      },
+      {
+        "key": "bus_factor",
+        "label": "Bus-factor (contributor concentration)",
+        "weight": 0.15,
+        "value": 58.6,
+        "evidence": "top contributor authored 61% of commits across 330 contributors",
+        "source": "GitHub contributors",
+        "confidence": "high"
+      },
+      {
+        "key": "license_risk",
+        "label": "License risk",
+        "weight": 0.15,
+        "value": 5,
+        "evidence": "MIT (permissive) → permissive obligations",
+        "source": "SPDX license id (local classification)",
+        "confidence": "high"
+      }
+    ]
+  },
+  "summary": "lodash carries an exploratory health/risk signal of 46/100 (Moderate; health 54/100), blended from five public-data sub-signals. Security posture: OpenSSF Scorecard 6.2/10 → inverted to 38/100 risk. Vulnerabilities: 1 known advisory in OSV (max severity HIGH). Maintenance: 985d since last release, 116d since last commit, 1 releases in the past year. MIT (permissive) → permissive obligations. This is an exploratory signal from public open-source metadata — not a security audit, a certification, or an endorsement of the project."
+}

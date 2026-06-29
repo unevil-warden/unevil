@@ -267,5 +267,60 @@
       }
     ]
   },
-  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,081 complaints about Capital One. Volume is steady (last 3 months averaged 64 per month versus 64 before). The most common issue is \"Problem with a purchase shown on your statement\" (24% of complaints), concentrated in credit card or prepaid card. The company responded on time to 97% of cases; 62% of closed cases ended without relief. Overall risk signal: Moderate (44/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion."
+  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,081 complaints about Capital One. Volume is steady (last 3 months averaged 64 per month versus 64 before). The most common issue is \"Problem with a purchase shown on your statement\" (24% of complaints), concentrated in credit card or prepaid card. The company responded on time to 97% of cases; 62% of closed cases ended without relief. Overall risk signal: Moderate (44/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion.",
+  "regulatory": {
+    "data_source": "sample",
+    "fdic": {
+      "cert": 4297,
+      "name": "Capital One, National Association",
+      "city": "McLean",
+      "state": "VA",
+      "active": true,
+      "asset_thousands": 478000000,
+      "established": "1933-07-07"
+    },
+    "sec": {
+      "cik": "0000927628",
+      "entity_name": "CAPITAL ONE FINANCIAL CORP",
+      "recent_filings": [
+        {
+          "form": "10-K",
+          "date": "2026-02-20",
+          "primary_doc": "cof-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "date": "2026-05-01",
+          "primary_doc": "cof-20260331.htm"
+        },
+        {
+          "form": "8-K",
+          "date": "2026-04-22",
+          "primary_doc": "cof-8k.htm"
+        }
+      ]
+    },
+    "lei": {
+      "lei": "6J1FOLBNV4Q1KYT3X664",
+      "legal_name": "Capital One Financial Corporation",
+      "jurisdiction": "US-DE",
+      "status": "ACTIVE",
+      "registration_status": "ISSUED"
+    },
+    "sources": [
+      {
+        "label": "FDIC BankFind Suite",
+        "url": "https://banks.data.fdic.gov/bankfind-suite/bankfind"
+      },
+      {
+        "label": "SEC EDGAR",
+        "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany"
+      },
+      {
+        "label": "GLEIF LEI Search",
+        "url": "https://search.gleif.org/"
+      }
+    ],
+    "note": "SAMPLE public-record cross-reference — synthetic, illustrative values for offline demo. Replaced by live FDIC / SEC EDGAR / GLEIF lookups when ingested in CI."
+  }
 }

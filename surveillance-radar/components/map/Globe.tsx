@@ -47,12 +47,18 @@ function toFeatureCollection(records: MapRecord[]) {
   };
 }
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function Globe({
   records,
   onSelect,
+  showOsm,
+  showWikidata,
 }: {
   records: MapRecord[];
   onSelect: (records: MapRecord[]) => void;
+  showOsm: boolean;
+  showWikidata: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -167,7 +173,68 @@ export default function Globe({
         },
       });
 
+      // --- Additional open-data layers (toggleable, distinct styling) ---
+      // Loaded as static GeoJSON from public/ via the same BASE-prefixed path
+      // mechanism the land outlines use, so they work under a subpath too.
+      // Baked at build time by `pnpm ingest:osm` / `pnpm ingest:wikidata`.
+
+      // OpenStreetMap surveillance / CCTV nodes — © OpenStreetMap contributors (ODbL).
+      map.addSource("osm", { type: "geojson", data: `${BASE}/osm-surveillance.geojson` });
+      map.addLayer({
+        id: "osm-glow",
+        type: "circle",
+        source: "osm",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.osm,
+          "circle-blur": 1,
+          "circle-opacity": 0.5,
+          "circle-radius": 9,
+        },
+      });
+      map.addLayer({
+        id: "osm-core",
+        type: "circle",
+        source: "osm",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.osmBright,
+          "circle-radius": 3.5,
+          "circle-stroke-color": THEME.osm,
+          "circle-stroke-width": 1.5,
+        },
+      });
+
+      // Wikidata law-enforcement agencies — Data from Wikidata (CC0).
+      // Rendered as small diamonds-via-stroke (violet) to separate from points.
+      map.addSource("wikidata", { type: "geojson", data: `${BASE}/wikidata-agencies.geojson` });
+      map.addLayer({
+        id: "wikidata-glow",
+        type: "circle",
+        source: "wikidata",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.wikidata,
+          "circle-blur": 1,
+          "circle-opacity": 0.45,
+          "circle-radius": 11,
+        },
+      });
+      map.addLayer({
+        id: "wikidata-core",
+        type: "circle",
+        source: "wikidata",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.wikidataBright,
+          "circle-radius": 4.5,
+          "circle-stroke-color": THEME.wikidata,
+          "circle-stroke-width": 2,
+        },
+      });
+
       wireInteractions(map);
+      wireExtraInteractions(map);
       setReady(true);
     });
 
@@ -238,6 +305,61 @@ export default function Globe({
       map.easeTo({ center: [clicked.longitude, clicked.latitude], zoom: Math.max(map.getZoom(), 6) });
     });
   }
+
+  // Hover popups for the additional open-data layers (OSM + Wikidata).
+  function wireExtraInteractions(map: MLMap) {
+    const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 12 });
+
+    const showPopup = (e: any, html: string) => {
+      const f = e.features?.[0];
+      if (!f) return;
+      map.getCanvas().style.cursor = "pointer";
+      popup.setLngLat((f.geometry as any).coordinates).setHTML(html).addTo(map);
+    };
+    const hide = () => {
+      map.getCanvas().style.cursor = "";
+      popup.remove();
+    };
+
+    map.on("mousemove", "osm-core", (e) => {
+      const p = e.features?.[0]?.properties as { surveillanceType?: string; operator?: string; description?: string };
+      showPopup(
+        e,
+        `<div style="font:12px/1.4 system-ui;color:#dbe6f2">
+           <strong>OSM · ${escapeHtml(p.surveillanceType || "surveillance")}</strong><br/>
+           ${escapeHtml(p.operator || p.description || "OpenStreetMap node")}<br/>
+           <span style="color:#7d8ba0">© OpenStreetMap contributors (ODbL)</span>
+         </div>`
+      );
+    });
+    map.on("mouseleave", "osm-core", hide);
+
+    map.on("mousemove", "wikidata-core", (e) => {
+      const p = e.features?.[0]?.properties as { name?: string; country?: string };
+      showPopup(
+        e,
+        `<div style="font:12px/1.4 system-ui;color:#dbe6f2">
+           <strong>${escapeHtml(p.name || "Agency")}</strong><br/>
+           ${escapeHtml(p.country || "")}<br/>
+           <span style="color:#7d8ba0">Wikidata (CC0)</span>
+         </div>`
+      );
+    });
+    map.on("mouseleave", "wikidata-core", hide);
+  }
+
+  // Toggle visibility of the additional layers when the props change.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const set = (id: string, on: boolean) => {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+    };
+    set("osm-glow", showOsm);
+    set("osm-core", showOsm);
+    set("wikidata-glow", showWikidata);
+    set("wikidata-core", showWikidata);
+  }, [showOsm, showWikidata, ready]);
 
   // Keep the GeoJSON source in sync with filtered records.
   useEffect(() => {

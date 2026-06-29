@@ -1,0 +1,83 @@
+{
+  "slug": "flask",
+  "name": "flask",
+  "display_name": "flask",
+  "ecosystem": "pypi",
+  "repo": "pallets/flask",
+  "data_source": "sample",
+  "snapshot_date": "2026-06-29",
+  "facts": {
+    "scorecard": {
+      "score": 7.9
+    },
+    "vulns": {
+      "count": 0,
+      "max_severity": null
+    },
+    "maintenance": {
+      "last_release_days": 169,
+      "last_commit_days": 7,
+      "releases_past_year": 5
+    },
+    "bus_factor": {
+      "top_share": 0.4,
+      "contributors": 704
+    },
+    "license": {
+      "spdx_id": "BSD-3-Clause"
+    }
+  },
+  "signal": {
+    "score": 15,
+    "health_score": 85,
+    "band": "Low",
+    "components": [
+      {
+        "key": "security_posture",
+        "label": "Security posture",
+        "weight": 0.25,
+        "value": 21,
+        "evidence": "OpenSSF Scorecard 7.9/10 → inverted to 21/100 risk",
+        "source": "OpenSSF Scorecard (via deps.dev)",
+        "confidence": "high"
+      },
+      {
+        "key": "known_vulns",
+        "label": "Known vulnerabilities",
+        "weight": 0.25,
+        "value": 0,
+        "evidence": "no known advisories in OSV",
+        "source": "OSV.dev",
+        "confidence": "high"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance / activity",
+        "weight": 0.2,
+        "value": 24.5,
+        "evidence": "169d since last release, 7d since last commit, 5 releases in the past year",
+        "source": "ecosyste.ms / GitHub",
+        "confidence": "high"
+      },
+      {
+        "key": "bus_factor",
+        "label": "Bus-factor (contributor concentration)",
+        "weight": 0.15,
+        "value": 28.6,
+        "evidence": "top contributor authored 40% of commits across 704 contributors",
+        "source": "GitHub contributors",
+        "confidence": "high"
+      },
+      {
+        "key": "license_risk",
+        "label": "License risk",
+        "weight": 0.15,
+        "value": 5,
+        "evidence": "BSD-3-Clause (permissive) → permissive obligations",
+        "source": "SPDX license id (local classification)",
+        "confidence": "high"
+      }
+    ]
+  },
+  "summary": "flask carries an exploratory health/risk signal of 15/100 (Low; health 85/100), blended from five public-data sub-signals. Security posture: OpenSSF Scorecard 7.9/10 → inverted to 21/100 risk. Vulnerabilities: no known advisories in OSV. Maintenance: 169d since last release, 7d since last commit, 5 releases in the past year. BSD-3-Clause (permissive) → permissive obligations. This is an exploratory signal from public open-source metadata — not a security audit, a certification, or an endorsement of the project."
+}

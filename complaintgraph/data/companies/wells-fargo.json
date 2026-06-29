@@ -279,5 +279,55 @@
       }
     ]
   },
-  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 878 complaints about Wells Fargo. Volume is steady (last 3 months averaged 44 per month versus 50 before). The most common issue is \"Managing an account\" (29% of complaints), concentrated in checking or savings account. The company responded on time to 97% of cases; 64.4% of closed cases ended without relief. Overall risk signal: Moderate (38/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion."
+  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 878 complaints about Wells Fargo. Volume is steady (last 3 months averaged 44 per month versus 50 before). The most common issue is \"Managing an account\" (29% of complaints), concentrated in checking or savings account. The company responded on time to 97% of cases; 64.4% of closed cases ended without relief. Overall risk signal: Moderate (38/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion.",
+  "regulatory": {
+    "data_source": "sample",
+    "fdic": {
+      "cert": 3511,
+      "name": "Wells Fargo Bank, National Association",
+      "city": "Sioux Falls",
+      "state": "SD",
+      "active": true,
+      "asset_thousands": 1720000000,
+      "established": "1870-01-01"
+    },
+    "sec": {
+      "cik": "0000072971",
+      "entity_name": "WELLS FARGO & COMPANY",
+      "recent_filings": [
+        {
+          "form": "10-K",
+          "date": "2026-02-18",
+          "primary_doc": "wfc-20251231.htm"
+        },
+        {
+          "form": "8-K",
+          "date": "2026-04-11",
+          "primary_doc": "wfc-8k.htm"
+        }
+      ]
+    },
+    "lei": {
+      "lei": "PBLD0EJDB5FWOLXP3B76",
+      "legal_name": "Wells Fargo & Company",
+      "jurisdiction": "US-DE",
+      "status": "ACTIVE",
+      "registration_status": "ISSUED"
+    },
+    "sources": [
+      {
+        "label": "FDIC BankFind Suite",
+        "url": "https://banks.data.fdic.gov/bankfind-suite/bankfind"
+      },
+      {
+        "label": "SEC EDGAR",
+        "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany"
+      },
+      {
+        "label": "GLEIF LEI Search",
+        "url": "https://search.gleif.org/"
+      }
+    ],
+    "note": "SAMPLE public-record cross-reference — synthetic, illustrative values for offline demo. Replaced by live FDIC / SEC EDGAR / GLEIF lookups when ingested in CI."
+  }
 }

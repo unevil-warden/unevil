@@ -96,6 +96,100 @@ function barList(items, total, color) {
 }
 
 // ---------------------------------------------------------------------------
+// Regulatory footprint — additive public-record cross-reference panel.
+// Renders FDIC / SEC EDGAR / GLEIF facts with source links, or a graceful
+// "no public regulatory match" message. Public records only — never a verdict.
+// ---------------------------------------------------------------------------
+function fmtAssets(thousands) {
+  if (thousands == null || !Number.isFinite(Number(thousands))) return '—';
+  const dollars = Number(thousands) * 1000;
+  if (dollars >= 1e12) return `$${(dollars / 1e12).toFixed(2)}T`;
+  if (dollars >= 1e9) return `$${(dollars / 1e9).toFixed(1)}B`;
+  if (dollars >= 1e6) return `$${(dollars / 1e6).toFixed(1)}M`;
+  return `$${fmt(dollars)}`;
+}
+
+function regFactRow(label, value) {
+  return `<div class="reg-fact"><span class="rl">${esc(label)}</span><span class="rv">${value}</span></div>`;
+}
+
+function regCardFDIC(f) {
+  if (!f) return '';
+  return `
+    <div class="reg-src">
+      <div class="reg-src-head">
+        <span class="reg-tag">FDIC BankFind</span>
+        <a href="https://banks.data.fdic.gov/bankfind-suite/bankfind?name=${encodeURIComponent(f.name || '')}" target="_blank" rel="noopener">view ↗</a>
+      </div>
+      ${regFactRow('Insured institution', esc(f.name || '—'))}
+      ${regFactRow('FDIC certificate', `#${esc(String(f.cert))}`)}
+      ${regFactRow('Location', esc([f.city, f.state].filter(Boolean).join(', ') || '—'))}
+      ${regFactRow('Total assets', fmtAssets(f.asset_thousands))}
+      ${regFactRow('Status', f.active ? 'Active' : 'Inactive')}
+      ${f.established ? regFactRow('Established', esc(f.established)) : ''}
+    </div>`;
+}
+
+function regCardSEC(s) {
+  if (!s) return '';
+  const filings = (s.recent_filings || []).slice(0, 5).map((fl) =>
+    `<li><span class="reg-form">${esc(fl.form || '—')}</span><span class="reg-fdate">${esc(fl.date || '')}</span></li>`,
+  ).join('');
+  const cikNum = String(s.cik || '').replace(/^0+/, '') || s.cik;
+  return `
+    <div class="reg-src">
+      <div class="reg-src-head">
+        <span class="reg-tag">SEC EDGAR</span>
+        <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(s.cik || '')}&type=&dateb=&owner=include&count=40" target="_blank" rel="noopener">view ↗</a>
+      </div>
+      ${regFactRow('Filer', esc(s.entity_name || '—'))}
+      ${regFactRow('CIK', esc(cikNum))}
+      ${filings ? `<div class="reg-filings"><div class="reg-fl-h">Recent filings</div><ul>${filings}</ul></div>` : ''}
+    </div>`;
+}
+
+function regCardLEI(l) {
+  if (!l) return '';
+  return `
+    <div class="reg-src">
+      <div class="reg-src-head">
+        <span class="reg-tag">GLEIF LEI</span>
+        <a href="https://search.gleif.org/#/record/${encodeURIComponent(l.lei || '')}" target="_blank" rel="noopener">view ↗</a>
+      </div>
+      ${regFactRow('Legal entity name', esc(l.legal_name || '—'))}
+      ${regFactRow('LEI', `<span class="reg-mono">${esc(l.lei || '—')}</span>`)}
+      ${l.jurisdiction ? regFactRow('Jurisdiction', esc(l.jurisdiction)) : ''}
+      ${l.status ? regFactRow('Entity status', esc(l.status)) : ''}
+      ${l.registration_status ? regFactRow('Registration', esc(l.registration_status)) : ''}
+    </div>`;
+}
+
+function regulatoryPanel(c) {
+  const reg = c.regulatory;
+  const isSample = !reg || reg.data_source === 'sample';
+  const tagClass = isSample ? 'reg-badge sample' : 'reg-badge';
+  const tagText = isSample ? 'SAMPLE public records' : 'Public records';
+  const hasMatch = reg && (reg.fdic || reg.sec || reg.lei);
+
+  const body = hasMatch
+    ? `<div class="reg-grid">${regCardFDIC(reg.fdic)}${regCardSEC(reg.sec)}${regCardLEI(reg.lei)}</div>`
+    : `<div class="reg-empty">No public regulatory match found in FDIC BankFind, SEC EDGAR, or GLEIF for this entity.
+        Many non-bank companies (e.g. credit bureaus and privately-held firms) have no FDIC charter or US SEC filer record.</div>`;
+
+  return `
+    <div class="card full reg-card">
+      <div class="reg-head">
+        <h3>Regulatory footprint</h3>
+        <span class="${tagClass}">${tagText}</span>
+      </div>
+      <p class="reg-note">Open public-record cross-reference from independent government / registry sources, shown for context.
+        These are identity and registration facts only — <strong>not</strong> findings of wrongdoing and not part of the complaint signal.</p>
+      ${body}
+      ${reg && reg.note ? `<div class="reg-prov">${esc(reg.note)}</div>` : ''}
+    </div>`;
+}
+
+// ---------------------------------------------------------------------------
 // Leaderboard + chips
 // ---------------------------------------------------------------------------
 function renderBadge() {
@@ -244,6 +338,8 @@ async function selectCompany(slug) {
             <div class="sc-ev">${esc(cmp.evidence)}</div>
           </div>`).join('')}
       </div>
+
+      ${regulatoryPanel(c)}
 
       ${c.sample_narratives.length ? `
       <div class="card full">

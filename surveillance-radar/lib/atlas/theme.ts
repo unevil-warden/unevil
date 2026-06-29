@@ -10,6 +10,12 @@ export const THEME = {
   pointBright: "#9af0ff", // selected / pulse highlight
   cluster: "#38e1ff",
   clusterText: "#03121a",
+  // Distinct hues for the additional open-data layers so they read separately
+  // from the cyan EFF points.
+  osm: "#ffb454", // amber — OpenStreetMap surveillance/CCTV nodes (ODbL)
+  osmBright: "#ffd9a0",
+  wikidata: "#b07cff", // violet — Wikidata law-enforcement agencies (CC0)
+  wikidataBright: "#dcc6ff",
   uiText: "#dbe6f2",
   uiMuted: "#7d8ba0",
 } as const;

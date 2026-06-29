@@ -259,5 +259,24 @@
       }
     ]
   },
-  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,600 complaints about Experian. Volume is steady (last 3 months averaged 110 per month versus 99 before). The most common issue is \"Incorrect information on your report\" (44% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 99% of cases; 88.4% of closed cases ended without relief. Overall risk signal: Elevated (58/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion."
+  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,600 complaints about Experian. Volume is steady (last 3 months averaged 110 per month versus 99 before). The most common issue is \"Incorrect information on your report\" (44% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 99% of cases; 88.4% of closed cases ended without relief. Overall risk signal: Elevated (58/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion.",
+  "regulatory": {
+    "data_source": "sample",
+    "fdic": null,
+    "sec": null,
+    "lei": {
+      "lei": "213800FNJTRSU3SZWN05",
+      "legal_name": "Experian Information Solutions, Inc.",
+      "jurisdiction": "US-OH",
+      "status": "ACTIVE",
+      "registration_status": "ISSUED"
+    },
+    "sources": [
+      {
+        "label": "GLEIF LEI Search",
+        "url": "https://search.gleif.org/"
+      }
+    ],
+    "note": "SAMPLE public-record cross-reference — synthetic, illustrative values for offline demo. Replaced by live FDIC / SEC EDGAR / GLEIF lookups when ingested in CI."
+  }
 }
