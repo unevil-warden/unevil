@@ -1,6 +1,7 @@
 # Build and publish the sub-project sites to GitHub Pages:
 #   /            -> Surveillance Radar (Next.js static export)
 #   /replygraph/ -> ReplyGraph demo (self-contained static page)
+#   /betterask/  -> BetterAsk download page (self-contained static page + zip)
 name: Deploy project sites to Pages
 
 on:
@@ -60,6 +61,12 @@ jobs:
           # ReplyGraph self-contained demo at /replygraph/
           mkdir -p _site/replygraph
           cp index.html _site/replygraph/index.html
+          # BetterAsk download page at /betterask/
+          # Served from a subfolder, so rewrite the repo-root "back" link
+          # (index.html, a sibling only in the repo) to the live site root.
+          mkdir -p _site/betterask
+          sed 's#href="index.html"#href="../"#' betterask.html > _site/betterask/index.html
+          cp betterask-extension.zip _site/betterask/betterask-extension.zip
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
