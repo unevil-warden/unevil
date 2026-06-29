@@ -28,3 +28,7 @@ demo/shot_*.png
 
 # Mobile render artifacts
 demo/m_*.png
+
+# Frontend screenshot artifacts
+frontend/app_*.png
+frontend/dist/

@@ -1,105 +1,62 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
 
-export default function Exports({ toast }) {
+export default function Exports({ ctx }) {
   const [exports, setExports] = useState([])
   const [loading, setLoading] = useState(true)
-  const [exporting, setExporting] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => { load() }, [])
-
   async function load() {
-    try {
-      const data = await api.getExports()
-      setExports(data)
-    } catch (e) {
-      toast(e.message, 'error')
-    } finally {
-      setLoading(false)
-    }
+    try { setExports(await api.getExports()) }
+    catch (e) { ctx.toast(e.message, 'error') }
+    finally { setLoading(false) }
   }
 
   async function exportMarkdown() {
-    setExporting(true)
-    try {
-      const result = await api.exportMarkdown()
-      toast(`Wrote ${result.files.length} markdown files`)
-      await load()
-    } catch (e) {
-      toast(e.message, 'error')
-    } finally {
-      setExporting(false)
-    }
+    setBusy(true)
+    try { const r = await api.exportMarkdown(); ctx.toast(`Wrote ${r.files.length} markdown files`); await load() }
+    catch (e) { ctx.toast(e.message, 'error') } finally { setBusy(false) }
   }
-
   async function exportObsidian() {
-    setExporting(true)
+    setBusy(true)
     try {
-      const result = await api.exportObsidian()
-      if (result.ok) {
-        toast(`Wrote ${result.files_written.length} files to vault`)
-        await load()
-      } else {
-        toast(result.error, 'error')
-      }
-    } catch (e) {
-      toast(e.message, 'error')
-    } finally {
-      setExporting(false)
-    }
+      const r = await api.exportObsidian()
+      if (r.ok) { ctx.toast(`Wrote ${r.files_written.length} files to vault`); await load() }
+      else ctx.toast(r.error, 'error')
+    } catch (e) { ctx.toast(e.message, 'error') } finally { setBusy(false) }
   }
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <h1>Exports</h1>
-        <p>Export summaries to Markdown or your Obsidian vault. Summaries only by default — never raw message dumps.</p>
-      </div>
+    <div className="wrap">
+      <div className="head"><div className="eyebrow">Output</div><h2>Exports</h2><p>Summaries only by default — never raw message dumps. User-triggered, timestamped, with confidence labels.</p></div>
 
-      <div className="dashboard-grid" style={{ marginBottom: 24 }}>
-        <div className="widget">
-          <div className="widget-title">↗ Markdown Export</div>
-          <p className="text-sm text-muted" style={{ marginBottom: 16 }}>
-            Writes daily digest, follow-ups, and analytics to local <code>.md</code> files in the export folder.
-          </p>
-          <button className="btn btn-primary" onClick={exportMarkdown} disabled={exporting}>
-            {exporting ? 'Exporting…' : 'Export Markdown'}
-          </button>
+      <div className="dash-cols">
+        <div className="card" style={{ padding: 22 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700 }}>Markdown</h3>
+          <p className="sm muted" style={{ margin: '10px 0 18px' }}>Daily digest, follow-ups, and analytics as local .md files in your export folder.</p>
+          <button className="btn solid" onClick={exportMarkdown} disabled={busy}>{busy ? 'Exporting…' : 'Export Markdown'}</button>
         </div>
-
-        <div className="widget">
-          <div className="widget-title">◆ Obsidian Export</div>
-          <p className="text-sm text-muted" style={{ marginBottom: 16 }}>
-            Writes into <code>/ReplyGraph/</code> in your vault with YAML frontmatter and wiki links.
-            Set the vault path in Settings first.
-          </p>
-          <button className="btn btn-primary" onClick={exportObsidian} disabled={exporting}>
-            {exporting ? 'Exporting…' : 'Export to Obsidian'}
-          </button>
+        <div className="card" style={{ padding: 22 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700 }}>Obsidian</h3>
+          <p className="sm muted" style={{ margin: '10px 0 18px' }}>Writes into /ReplyGraph/ with YAML frontmatter and [[wiki links]]. Set a vault path in Settings first.</p>
+          <button className="btn solid" onClick={exportObsidian} disabled={busy}>{busy ? 'Exporting…' : 'Export to Obsidian'}</button>
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: 24, borderColor: 'rgba(56,217,160,0.2)' }}>
-        <div className="text-sm text-muted">
-          <strong style={{ color: 'var(--text)' }}>Export rules:</strong> user-triggered only · summaries by default ·
-          confidence labels included · excluded contacts never exported · timestamped.
-        </div>
-      </div>
-
-      <div className="section-title">Recent Exports</div>
+      <div className="sec-title" style={{ marginTop: 30 }}>Recent exports</div>
       {loading && <div className="loading">Loading…</div>}
-      {!loading && exports.length === 0 && (
-        <div className="empty-state">No exports yet.</div>
-      )}
-      {exports.map(e => (
-        <div key={e.id} className="card-sm" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <span className="badge badge-source">{e.type}</span>
-            <span className="text-sm" style={{ marginLeft: 8, color: 'var(--text-muted)', wordBreak: 'break-all' }}>{e.path}</span>
-          </div>
-          <span className="text-sm text-muted">{new Date(e.created_at).toLocaleString()}</span>
+      {!loading && exports.length === 0 && <div className="empty">No exports yet.</div>}
+      {exports.length > 0 && (
+        <div className="panel">
+          {exports.map(e => (
+            <div key={e.id} className="fu">
+              <div><span className="tag">{e.type}</span> <span className="sm muted" style={{ marginLeft: 8, wordBreak: 'break-all' }}>{e.path}</span></div>
+              <span className="sm faint">{new Date(e.created_at).toLocaleString()}</span>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   )
 }
