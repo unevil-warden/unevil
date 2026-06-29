@@ -53,11 +53,15 @@ const TEST_HTML = `<!DOCTYPE html><html><head><title>Test</title></head>
   <script>document.getElementById('prompt-textarea').focus()</script>
 </body></html>`
 
+// MV3 extension service workers are unreliable under --headless=new on newer
+// Chrome builds. Set SMOKE_HEADED=1 (and wrap with xvfb-run on CI) to launch
+// headed Chrome, where the background service worker registers reliably.
+const headed = process.env.SMOKE_HEADED === '1'
 const ctx = await chromium.launchPersistentContext('', {
   executablePath: findChromium(),
-  headless: true,
+  headless: !headed,
   args: [
-    '--headless=new',
+    ...(headed ? [] : ['--headless=new']),
     `--disable-extensions-except=${EXT}`,
     `--load-extension=${EXT}`,
     '--no-sandbox',
@@ -66,7 +70,7 @@ const ctx = await chromium.launchPersistentContext('', {
 
 try {
   let sw = ctx.serviceWorkers()[0]
-  if (!sw) sw = await ctx.waitForEvent('serviceworker', { timeout: 10000 })
+  if (!sw) sw = await ctx.waitForEvent('serviceworker', { timeout: 30000 })
   const extId = new URL(sw.url()).host
   log(!!extId, `service worker registered (extension id = ${extId})`)
 

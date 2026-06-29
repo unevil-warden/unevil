@@ -84,6 +84,7 @@ Then in Chrome:
 - **A second model can still be wrong.** Second opinion mode reduces hallucination risk but does not eliminate it.
 - **Contenteditable replacement.** `document.execCommand` is deprecated but still works in most browsers. ProseMirror/Quill editors may need site-specific handling if the fallback breaks.
 - **Shadow DOM pointer-events.** The floating UI uses a shadow root for CSS isolation. If clicks don't register on some sites, it may need tuning in `src/content/index.tsx`.
+- **Precompute spends extra API calls.** The optional "Precompute suggestions" toggle (Settings → API, API mode only, off by default) fetches the rewrite in the background as soon as the "fix ask" pill is stable, so the card opens instantly on click. The trade-off is one API call per stable weak prompt even if you never click the pill.
 
 ---
 

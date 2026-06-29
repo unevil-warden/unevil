@@ -114,6 +114,7 @@ export interface BetterAskSettings {
   autoAudit: boolean
   doNotLearnDefault: boolean
   minutesPerAvoidedFollowUp: number
+  precompute: boolean
 }
 
 export const DEFAULT_SETTINGS: BetterAskSettings = {
@@ -129,4 +130,5 @@ export const DEFAULT_SETTINGS: BetterAskSettings = {
   autoAudit: false,
   doNotLearnDefault: false,
   minutesPerAvoidedFollowUp: 1.5,
+  precompute: false,
 }

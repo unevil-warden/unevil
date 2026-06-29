@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import type { BetterAskRule, BetterAskSettings, ImproveResult, PromptCategory } from '../shared/types'
 import { improvePrompt } from '../shared/improve'
 import { appendEvent } from '../shared/storage'
@@ -33,6 +33,8 @@ export function FloatingUI({ inputElement, currentText, settings, rules, visible
   const [editedText, setEditedText] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [pillPos, setPillPos] = useState({ bottom: 80, right: 20 })
+  // Single-slot cache for an optionally precomputed suggestion, keyed by exact prompt text.
+  const prefetchRef = useRef<{ text: string; result: ImproveResult } | null>(null)
 
   // Update pill position relative to input element
   useEffect(() => {
@@ -64,8 +66,33 @@ export function FloatingUI({ inputElement, currentText, settings, rules, visible
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentText])
 
+  // Optional precompute: when the pill is showing in API mode and the prompt has been
+  // stable for 400ms, fetch the suggestion in the background so the card opens instantly
+  // on click. Gated to API mode (local heuristics are already instant) and opt-in, since
+  // it spends an API call per stable weak prompt even if the user never clicks the pill.
+  useEffect(() => {
+    if (!visible || !settings.precompute || settings.localOnly || !settings.apiKey) return
+    const text = currentText
+    if (!text.trim() || prefetchRef.current?.text === text) return
+    let cancelled = false
+    const timer = setTimeout(() => {
+      improvePrompt(text, settings, rules)
+        .then((r) => { if (!cancelled) prefetchRef.current = { text, result: r } })
+        .catch(() => { /* ignore — handleFixAsk falls back to a live call */ })
+    }, 400)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [visible, currentText, settings, rules])
+
   const handleFixAsk = useCallback(async () => {
     if (!currentText.trim()) return
+    // Use a precomputed suggestion if one is ready for this exact text.
+    const cached = prefetchRef.current
+    if (cached && cached.text === currentText) {
+      setResult(cached.result)
+      setEditedText(cached.result.betterAsk)
+      setUiState('suggestion')
+      return
+    }
     setUiState('loading')
     setError(null)
     try {
