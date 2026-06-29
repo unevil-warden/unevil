@@ -91,7 +91,12 @@ jobs:
           cp -r complaintgraph/data _site/complaintgraph/data
 
       - name: Setup Pages
+        # enablement: true makes this action create/enable the Pages site (with
+        # GitHub Actions as the source) if it isn't already, instead of 404ing
+        # when no Pages site exists yet. Requires the pages: write permission set above.
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
