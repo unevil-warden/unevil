@@ -1,28 +1,22 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Deploy the existing static homepage AND the Surveillance Radar app to GitHub Pages.
+# The homepage stays at the site root; the Next.js app is built and served at /surveillance-radar/.
+name: Deploy to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: ["main", "claude/thoughts-on-this-kurwxc"]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -31,13 +25,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: surveillance-radar/pnpm-lock.yaml
+
+      - name: Build Surveillance Radar (static export)
+        working-directory: surveillance-radar
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/surveillance-radar
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm ingest:atlas
+          pnpm build
+
+      - name: Assemble site (homepage + app subpath)
+        run: |
+          mkdir -p _site
+          rsync -a --exclude surveillance-radar --exclude .git --exclude _site --exclude .github ./ _site/
+          mkdir -p _site/surveillance-radar
+          cp -r surveillance-radar/out/. _site/surveillance-radar/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
