@@ -2,6 +2,7 @@
 #   /                -> Portfolio landing page (index.html)
 #   /radar/          -> Surveillance Radar (Next.js static export)
 #   /replygraph/     -> ReplyGraph demo (self-contained static page)
+#   /jobagent/       -> JobAgent demo (self-contained static page)
 #   /betterask/      -> BetterAsk download page + extension zip
 #   /complaintgraph/ -> ComplaintGraph dashboard (static + freshly baked CFPB data)
 name: Deploy project sites to Pages
@@ -74,6 +75,9 @@ jobs:
           # ReplyGraph self-contained demo at /replygraph/
           mkdir -p _site/replygraph
           cp replygraph/demo/index.html _site/replygraph/index.html
+          # JobAgent self-contained demo at /jobagent/
+          mkdir -p _site/jobagent
+          cp jobagent/demo/index.html _site/jobagent/index.html
           # BetterAsk download page + extension zip at /betterask/
           mkdir -p _site/betterask
           cp betterask.html _site/betterask/index.html

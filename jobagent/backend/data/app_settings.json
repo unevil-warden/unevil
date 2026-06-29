@@ -1,0 +1,13 @@
+{
+  "llm_api_key": "",
+  "model": "claude-opus-4-8",
+  "gmail_client_secret_path": "",
+  "gmail_token_path": "",
+  "max_jobs_per_search": 12,
+  "inbox_lookback_days": 14,
+  "token_pricing": {
+    "claude-opus-4-8": { "input_per_1m": 5.0, "output_per_1m": 25.0 },
+    "claude-sonnet-4-6": { "input_per_1m": 3.0, "output_per_1m": 15.0 },
+    "claude-haiku-4-5": { "input_per_1m": 1.0, "output_per_1m": 5.0 }
+  }
+}
