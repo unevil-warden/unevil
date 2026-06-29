@@ -7,8 +7,9 @@ This repository is the umbrella home for several independent projects. Each one
 lives in its own folder (or, while in progress, its own pull request) so they can
 grow without stepping on each other.
 
-**Live site:** https://unevil-warden.github.io/unevil/ — the **Surveillance Radar**
-3D globe (demo data, no API keys).
+**Live sites:**
+- **Surveillance Radar** — https://unevil-warden.github.io/unevil/ (the 3D globe; demo data, no API keys)
+- **ReplyGraph demo** — https://unevil-warden.github.io/unevil/replygraph/ (static UI demo, sample data, no backend)
 
 ---
 
@@ -17,7 +18,7 @@ grow without stepping on each other.
 | Project | What it is | Stack | Where it lives | Status |
 |---|---|---|---|---|
 | **Surveillance Radar** | An interactive 3D globe ("FlightRadar24 for surveillance tech") visualizing the EFF *Atlas of Surveillance* dataset — public data only, with attribution. | Next.js · MapLibre | [`surveillance-radar/`](./surveillance-radar/) | 🌐 Live site |
-| **ReplyGraph** | Local-first macOS app that reads *your own* iMessage history, ranks which conversations need attention, drafts replies in your voice, flags risky tone, and extracts follow-ups. Read-only, copy-to-clipboard only — never auto-sends. | Python (FastAPI) · React (Vite) | [`replygraph/`](./replygraph/) | ✅ In this repo |
+| **ReplyGraph** | Local-first macOS app that reads *your own* iMessage history, ranks which conversations need attention, drafts replies in your voice, flags risky tone, and extracts follow-ups. Read-only, copy-to-clipboard only — never auto-sends. | Python (FastAPI) · React (Vite) | [`replygraph/`](./replygraph/) · [live demo](https://unevil-warden.github.io/unevil/replygraph/) | ✅ In repo + live demo |
 | **BetterAsk** | A local-first Chrome extension that's "autocorrect for AI prompts" — catches vague prompts before you send them and suggests clearer versions. | Vite · React · TypeScript | [PR #2](https://github.com/unevil-warden/unevil/pull/2) | 🚧 In review |
 
 > The published site is the Surveillance Radar globe. ReplyGraph lives in the repo

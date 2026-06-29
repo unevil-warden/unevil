@@ -1,6 +1,7 @@
-# Build the Surveillance Radar (Next.js static export) and publish it as the
-# site root on GitHub Pages, so https://<owner>.github.io/<repo>/ shows the globe.
-name: Deploy Surveillance Radar to Pages
+# Build and publish the sub-project sites to GitHub Pages:
+#   /            -> Surveillance Radar (Next.js static export)
+#   /replygraph/ -> ReplyGraph demo (self-contained static page)
+name: Deploy project sites to Pages
 
 on:
   push:
@@ -50,13 +51,23 @@ jobs:
           pnpm ingest:atlas
           pnpm build
 
+      - name: Assemble multi-page site
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          # Surveillance Radar at the site root
+          cp -r surveillance-radar/out/. _site/
+          # ReplyGraph self-contained demo at /replygraph/
+          mkdir -p _site/replygraph
+          cp index.html _site/replygraph/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: surveillance-radar/out
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
