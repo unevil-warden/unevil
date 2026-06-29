@@ -227,6 +227,11 @@ export function Options() {
               <Field label="Model">
                 <Input value={settings.apiModel} onChange={(v) => updateSetting('apiModel', v)} placeholder="gpt-4o-mini" />
               </Field>
+              <Toggle
+                checked={settings.precompute}
+                onChange={(v) => updateSetting('precompute', v)}
+                label="Precompute suggestions (instant card on click, uses an extra API call per prompt)"
+              />
             </div>
           )}
 
