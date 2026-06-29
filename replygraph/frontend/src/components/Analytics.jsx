@@ -1,152 +1,96 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
 
-const TONE_TREND_LABELS = {
-  stable: '→ stable',
-  improving: '↑ improving',
-  declining: '↓ declining',
-  shifting: '~ shifting',
-}
+const TREND = { declining: '↓ higher-friction lately', improving: '↑ warming up', stable: '→ stable', shifting: '~ shifting' }
 
-export default function Analytics() {
+export default function Analytics({ ctx }) {
   const [data, setData] = useState([])
+  const [tokens, setTokens] = useState(null)
   const [loading, setLoading] = useState(true)
   const [rebuilding, setRebuilding] = useState(false)
-  const [tokenUsage, setTokenUsage] = useState(null)
 
   useEffect(() => {
     Promise.all([api.getAnalytics(), api.getTokenUsage()])
-      .then(([a, t]) => { setData(a); setTokenUsage(t) })
+      .then(([a, t]) => { setData(a); setTokens(t) })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
   async function rebuild() {
     setRebuilding(true)
-    try {
-      await api.rebuildAnalytics()
-      const fresh = await api.getAnalytics()
-      setData(fresh)
-    } finally {
-      setRebuilding(false)
-    }
+    try { await api.rebuildAnalytics(); setData(await api.getAnalytics()); ctx.toast('Analytics rebuilt') }
+    catch (e) { ctx.toast(e.message, 'error') }
+    finally { setRebuilding(false) }
   }
 
-  if (loading) return <div className="loading">Loading analytics…</div>
+  if (loading) return <div className="wrap"><div className="loading">Loading analytics…</div></div>
 
   return (
-    <div className="page">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="wrap">
+      <div className="head row between">
         <div>
-          <h1>Analytics</h1>
-          <p>Relationship and tone estimates. These are heuristic guesses, not facts.</p>
+          <div className="eyebrow">Estimates</div><h2>Analytics</h2>
+          <p>Heuristic estimates from text patterns — not facts, not psychology. Confidence shows how much data was available.</p>
         </div>
-        <button className="btn btn-ghost" onClick={rebuild} disabled={rebuilding}>
-          {rebuilding ? 'Rebuilding…' : '↻ Rebuild'}
-        </button>
+        <button className="btn" onClick={rebuild} disabled={rebuilding}>{rebuilding ? 'Rebuilding…' : '↻ Rebuild'}</button>
       </div>
 
-      <div className="card" style={{ marginBottom: 20, borderColor: 'rgba(247,201,75,0.2)' }}>
-        <div className="text-sm" style={{ color: 'var(--warning)' }}>
-          ⚠ These are estimates based on text patterns — not psychological profiles.
-          Confidence labels indicate how much data was available. Low confidence means take it lightly.
-        </div>
+      <div className="notice" style={{ marginBottom: 22 }}>
+        These are <b>estimates</b>. Low confidence means take it lightly. ReplyGraph describes threads ("higher-friction lately") — it does not judge people.
       </div>
 
-      {data.length === 0 && (
-        <div className="empty-state">No analytics yet. Sync messages first, then rebuild.</div>
-      )}
+      {data.length === 0 && <div className="empty">No analytics yet. Sync messages, then rebuild.</div>}
 
       {data.map((a, i) => (
-        <div key={i} className="analytics-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div key={i} className="card acard">
+          <div className="a-top">
             <div>
-              <div style={{ fontWeight: 600, fontSize: 15 }}>{a.contact_name}</div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span className={`tone-chip tone-${a.emotional_tone}`}>{a.emotional_tone}</span>
-                <span className="text-sm text-muted">
-                  {TONE_TREND_LABELS[a.tone_trend] || a.tone_trend}
-                </span>
-                <span className="conf">{a.confidence} confidence</span>
+              <div className="a-name">{a.contact_name}</div>
+              <div className="a-meta">
+                <span className="tag">{a.emotional_tone}</span>
+                <span className="sm muted">{TREND[a.tone_trend] || a.tone_trend}</span>
+                <span className="conf">{a.confidence} conf</span>
               </div>
             </div>
-            <div style={{ textAlign: 'right', fontSize: 12, color: 'var(--text-muted)' }}>
-              <div>{a.message_volume} messages</div>
-              {a.last_interaction && (
-                <div>{new Date(a.last_interaction).toLocaleDateString()}</div>
-              )}
+            <div className="sm muted" style={{ textAlign: 'right' }}>
+              {a.message_volume} messages{a.last_interaction && <><br />{new Date(a.last_interaction).toLocaleDateString()}</>}
             </div>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, marginTop: 16 }}>
-            {a.avg_response_hours != null && (
-              <Stat label="Avg response" value={`~${a.avg_response_hours}h`} />
-            )}
-            {a.user_waiting_on_them > 0 && (
-              <Stat label="You're waiting" value="Yes" color="var(--warning)" />
-            )}
-            {a.they_waiting_on_user > 0 && (
-              <Stat label="They're waiting" value="Yes" color="var(--urgent)" />
-            )}
-            {a.common_topics?.length > 0 && (
-              <Stat label="Common topics" value={a.common_topics.join(', ')} />
-            )}
+          <div className="stats">
+            {a.avg_response_hours != null && <Stat k="Avg response" v={`~${a.avg_response_hours}h`} />}
+            <Stat k="You're waiting" v={a.user_waiting_on_them ? 'Yes' : 'No'} />
+            {a.common_topics?.length > 0 && <Stat k="Topics" v={a.common_topics.join(', ')} />}
+            {a.open_loops?.length > 0 && <Stat k="Open loop" v={a.open_loops[0].slice(0, 38) + '…'} pop />}
           </div>
-
-          {a.open_loops?.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <div className="text-sm text-muted" style={{ marginBottom: 4 }}>Open loops:</div>
-              {a.open_loops.map((loop, j) => (
-                <div key={j} className="text-sm" style={{ color: 'var(--warning)', marginBottom: 3 }}>
-                  ↻ {loop}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       ))}
 
-      {tokenUsage?.by_operation?.length > 0 && (
-        <div style={{ marginTop: 32 }}>
-          <div className="section-title">Token Usage Estimates</div>
-          <div className="card">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ color: 'var(--text-muted)', textAlign: 'left' }}>
-                  <th style={{ padding: '6px 12px 6px 0' }}>Operation</th>
-                  <th style={{ padding: '6px 12px 6px 0' }}>Count</th>
-                  <th style={{ padding: '6px 12px 6px 0' }}>Input tokens</th>
-                  <th style={{ padding: '6px 12px 6px 0' }}>Output tokens</th>
-                  <th style={{ padding: '6px 0' }}>Est. cost</th>
-                </tr>
-              </thead>
+      {tokens?.by_operation?.length > 0 && (
+        <>
+          <div className="sec-title" style={{ marginTop: 32 }}>Token usage estimate</div>
+          <div className="card" style={{ padding: 20 }}>
+            <table>
+              <thead><tr><th>Operation</th><th>Runs</th><th>Input</th><th>Output</th><th>Est. cost</th></tr></thead>
               <tbody>
-                {tokenUsage.by_operation.map((row, i) => (
-                  <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
-                    <td style={{ padding: '8px 12px 8px 0' }}>{row.operation}</td>
-                    <td style={{ padding: '8px 12px 8px 0', color: 'var(--text-muted)' }}>{row.count}</td>
-                    <td style={{ padding: '8px 12px 8px 0', color: 'var(--text-muted)' }}>{row.total_input_tokens?.toLocaleString()}</td>
-                    <td style={{ padding: '8px 12px 8px 0', color: 'var(--text-muted)' }}>{row.total_output_tokens?.toLocaleString()}</td>
-                    <td style={{ padding: '8px 0', color: 'var(--accent2)' }}>${row.estimated_cost_usd?.toFixed(4)}</td>
+                {tokens.by_operation.map((r, i) => (
+                  <tr key={i}>
+                    <td>{r.operation}</td>
+                    <td className="muted">{r.count}</td>
+                    <td className="muted">{r.total_input_tokens?.toLocaleString()}</td>
+                    <td className="muted">{r.total_output_tokens?.toLocaleString()}</td>
+                    <td style={{ color: 'var(--pop)', fontWeight: 700 }}>${r.estimated_cost_usd?.toFixed(4)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="text-sm text-muted" style={{ marginTop: 8 }}>
-              Prices come from settings and may not reflect actual billing. Update pricing in Settings.
-            </div>
+            <p className="sm muted" style={{ marginTop: 12 }}>Prices come from your editable settings and may not match real billing.</p>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
 }
 
-function Stat({ label, value, color }) {
-  return (
-    <div>
-      <div className="text-sm text-muted">{label}</div>
-      <div style={{ fontWeight: 600, fontSize: 13, color: color || 'var(--text)', marginTop: 2 }}>{value}</div>
-    </div>
-  )
+function Stat({ k, v, pop }) {
+  return <div className="stat"><div className="k">{k}</div><div className="v" style={pop ? { fontSize: 12.5, color: 'var(--pop)' } : { fontSize: 13 }}>{v}</div></div>
 }
