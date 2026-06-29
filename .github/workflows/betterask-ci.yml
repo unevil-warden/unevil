@@ -24,6 +24,12 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    # Install Playwright browsers to a known path so the smoke test's findChromium()
+    # resolves the FULL Chrome build here. Without this, Playwright defaults to
+    # chrome-headless-shell, which can't load MV3 extensions, so the extension's
+    # service worker never registers and the test times out.
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
     defaults:
       run:
         working-directory: betterask
