@@ -1,0 +1,63 @@
+# Build the Surveillance Radar (Next.js static export) and publish it as the
+# site root on GitHub Pages, so https://<owner>.github.io/<repo>/ shows the globe.
+name: Deploy Surveillance Radar to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let in-progress runs finish.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: surveillance-radar/pnpm-lock.yaml
+
+      - name: Build static export
+        working-directory: surveillance-radar
+        # Project pages are served from /<repo>/, so the app must be built with
+        # that base path baked into asset and data URLs.
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm ingest:atlas
+          pnpm build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: surveillance-radar/out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
