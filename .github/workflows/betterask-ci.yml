@@ -56,5 +56,13 @@ jobs:
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
 
-      - name: Smoke test (headless Chromium E2E)
-        run: npm run test:smoke
+      - name: Install xvfb
+        # Headed Chrome (see below) needs a virtual display on the runner.
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Smoke test (headed Chromium E2E under xvfb)
+        # MV3 extension service workers don't register reliably under
+        # --headless=new on newer Chrome, so run headed under a virtual display.
+        env:
+          SMOKE_HEADED: "1"
+        run: xvfb-run -a npm run test:smoke
