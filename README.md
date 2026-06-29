@@ -45,7 +45,6 @@ These show up across everything here:
 ```
 .
 ├── index.html              # Live ReplyGraph demo (served via GitHub Pages)
-├── home_unevillabs.html    # unEvilGenius Labs landing page
 ├── replygraph/             # ReplyGraph app — see replygraph/README.md
 │   ├── backend/            # FastAPI + SQLite
 │   └── frontend/           # React + Vite
