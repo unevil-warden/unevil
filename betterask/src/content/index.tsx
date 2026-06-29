@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { BetterAskRule, BetterAskSettings, ResponseAudit } from '../shared/types'
 import { DEFAULT_SETTINGS } from '../shared/types'
@@ -8,7 +8,6 @@ import {
   getActivePromptElement,
   getInputText,
   shouldSuggest,
-  watchInputElement,
   extractLatestResponseText,
 } from './detector'
 import { isSupportedSite } from './dom'
@@ -29,7 +28,6 @@ function ContentApp() {
   const [showPill, setShowPill] = useState(false)
   const [audit, setAudit] = useState<ResponseAudit | null>(null)
   const lastResponseRef = useRef<string | null>(null)
-  const unwatchRef = useRef<(() => void) | null>(null)
 
   // Load settings and rules
   useEffect(() => {
@@ -44,50 +42,35 @@ function ContentApp() {
     chrome.storage.onChanged.addListener(() => load())
   }, [])
 
-  const handleTextChange = useCallback(
-    debounce((text: string) => {
-      setCurrentText(text)
-      if (settings.enabled) {
-        setShowPill(shouldSuggest(text, settings.sensitivity))
-      }
-    }, 500),
-    [settings]
-  )
-
-  // Watch for focused input elements
-  const attachToInput = useCallback(
-    (el: HTMLElement) => {
-      if (el === activeInput) return
-      unwatchRef.current?.()
-      setActiveInput(el)
-      setShowPill(false)
-      const unwatch = watchInputElement(el, handleTextChange)
-      unwatchRef.current = unwatch
-    },
-    [activeInput, handleTextChange]
-  )
-
-  // Poll for active input (AI sites use dynamic rendering)
+  // Watch all input via a single document-level capture listener. This is far more robust
+  // than attaching/detaching per-element listeners, which churned with React re-renders and
+  // could drop the listener entirely. Capture phase catches textarea/input AND contenteditable
+  // editors (ProseMirror/Quill dispatch bubbling input events).
   useEffect(() => {
     if (!settings.enabled) return
 
-    const poll = setInterval(() => {
+    const evaluate = debounce(() => {
       const el = getActivePromptElement()
-      if (el) attachToInput(el)
-    }, 1500)
+      if (!el) return
+      setActiveInput(el)
+      const text = getInputText(el)
+      setCurrentText(text)
+      setShowPill(shouldSuggest(text, settings.sensitivity))
+    }, 400)
 
-    const focusHandler = () => {
+    const onInput = () => evaluate()
+    const onFocusIn = () => {
       const el = getActivePromptElement()
-      if (el) attachToInput(el)
+      if (el) setActiveInput(el)
     }
 
-    document.addEventListener('focusin', focusHandler)
+    document.addEventListener('input', onInput, true)
+    document.addEventListener('focusin', onFocusIn, true)
     return () => {
-      clearInterval(poll)
-      document.removeEventListener('focusin', focusHandler)
-      unwatchRef.current?.()
+      document.removeEventListener('input', onInput, true)
+      document.removeEventListener('focusin', onFocusIn, true)
     }
-  }, [settings.enabled, attachToInput])
+  }, [settings.enabled, settings.sensitivity])
 
   // Auto-audit: watch for new response content
   useEffect(() => {

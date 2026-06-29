@@ -150,6 +150,7 @@ export function FloatingUI({ inputElement, currentText, settings, rules, visible
     outline: 'none',
     transition: 'transform 0.15s, box-shadow 0.15s',
     userSelect: 'none',
+    pointerEvents: 'auto',
   }
 
   const cardStyle: React.CSSProperties = {
@@ -166,6 +167,7 @@ export function FloatingUI({ inputElement, currentText, settings, rules, visible
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     color: '#EEF2F7',
     overflow: 'hidden',
+    pointerEvents: 'auto',
   }
 
   if (uiState === 'pill') {

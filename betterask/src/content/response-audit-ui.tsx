@@ -45,6 +45,7 @@ export function ResponseAuditUI({ audit, onClose }: ResponseAuditUIProps) {
     boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     color: '#EEF2F7',
+    pointerEvents: 'auto',
   }
 
   return (
