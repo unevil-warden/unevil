@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #05070d;
+  color: #dbe6f2;
+  overscroll-behavior: none;
+}
+
+/* MapLibre canvas should fill its container with no focus ring */
+.maplibregl-canvas:focus {
+  outline: none;
+}
+
+/* Hide default MapLibre attribution chrome; we render our own attribution in the footer. */
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+@keyframes pulse-dot {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #1b2433;
+  border-radius: 8px;
+}
