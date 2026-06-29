@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BetterAsk — Autocorrect for your AI prompts</title>
+<meta name="description" content="BetterAsk is a Chrome extension that fixes vague prompts before you send them to ChatGPT, Claude, Perplexity, and Gemini. Local-first, no account, no tracking.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060910;--s1:#0C1017;--s2:#111620;--s3:#161C28;
+  --b1:#1A2030;--b2:#222A38;
+  --green:#00E5A0;--green2:#00B87A;--gd:rgba(0,229,160,0.07);
+  --gold:#F5C518;--blue:#4D9EFF;--red:#FF6B6B;
+  --t1:#EEF2F7;--t2:#7A8899;--t3:#3A4455;
+  --mono:'Space Mono',monospace;--sans:'Space Grotesk',sans-serif
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,229,160,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.018) 1px,transparent 1px);
+  background-size:48px 48px
+}
+.orb{position:fixed;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 68%);animation:orb 12s ease-in-out infinite}
+@keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,30px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 20px 90px}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.nav-l{display:flex;align-items:center;gap:9px}
+.nav-logo{font-size:16px}
+.nav-name{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--t1);font-weight:700}
+.nav-name span{color:var(--green)}
+.nav-back{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--green)}
+
+/* HERO */
+.hero{padding:44px 0 30px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  color:var(--green);text-transform:uppercase;padding:5px 12px;border:1px solid rgba(0,229,160,.22);border-radius:4px;background:var(--gd);margin-bottom:26px}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+.hero h1{font-size:46px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-bottom:16px}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.65;max-width:540px;margin:0 auto 30px}
+.hero-sub strong{color:var(--t1);font-weight:500}
+.cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:600;
+  padding:12px 22px;border-radius:9px;text-decoration:none;cursor:pointer;transition:transform .15s,box-shadow .15s,background .2s;border:none}
+.btn-primary{background:var(--green);color:var(--bg);box-shadow:0 4px 24px rgba(0,229,160,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(0,229,160,.45);background:#00FFB3}
+.btn-ghost{background:var(--s2);color:var(--t1);border:1px solid var(--b2)}
+.btn-ghost:hover{border-color:var(--green2);transform:translateY(-2px)}
+.cta-meta{font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.04em}
+.cta-meta b{color:var(--t2);font-weight:400}
+
+/* SECTION */
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.sl::after{content:'';flex:1;height:1px;background:var(--b1)}
+.div{height:1px;background:linear-gradient(90deg,var(--green),transparent 65%);margin:46px 0;opacity:.16}
+
+/* DEMO */
+.demo{background:var(--s1);border:1px solid var(--b1);border-radius:16px;overflow:hidden;box-shadow:0 0 60px rgba(0,229,160,.04)}
+.demo-head{padding:12px 18px;border-bottom:1px solid var(--b1);background:var(--s2);display:flex;align-items:center;gap:9px}
+.demo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+.demo-title{font-family:var(--mono);font-size:11px;color:var(--t2)}
+.demo-title b{color:var(--green)}
+.demo-body{padding:20px}
+.row-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+.row-label.bad{color:var(--red)}
+.row-label.good{color:var(--green)}
+.bubble{border-radius:10px;padding:13px 16px;font-size:14px;line-height:1.6;min-height:48px}
+.bubble.bad{background:rgba(255,107,107,.05);border:1px solid rgba(255,107,107,.18);color:var(--t2)}
+.bubble.good{background:var(--gd);border:1px solid rgba(0,229,160,.2);color:var(--t1)}
+.arrow{display:flex;align-items:center;gap:8px;justify-content:center;margin:14px 0;font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
+.arrow::before,.arrow::after{content:'';height:1px;width:40px;background:linear-gradient(90deg,transparent,var(--green2))}
+.arrow::after{transform:rotate(180deg)}
+.cursor{display:inline-block;width:7px;height:15px;background:var(--green);margin-left:2px;vertical-align:middle;animation:pulse 1s steps(2) infinite}
+.demo-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 20px 18px}
+.dtab{font-family:var(--mono);font-size:10px;color:var(--t2);background:transparent;border:1px solid var(--b2);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all .2s}
+.dtab:hover{border-color:rgba(0,229,160,.32);color:var(--green)}
+.dtab.on{background:var(--gd);border-color:rgba(0,229,160,.32);color:var(--green)}
+
+/* FEATURES */
+.feat{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.fc{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px 20px;transition:border-color .2s,transform .2s}
+.fc:hover{border-color:var(--b2);transform:translateY(-2px)}
+.fc-i{font-size:20px;margin-bottom:10px}
+.fc h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.fc p{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:8px}
+.step{display:flex;gap:15px;align-items:flex-start;background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 18px}
+.step-n{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--gd);border:1px solid rgba(0,229,160,.25);color:var(--green);font-family:var(--mono);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step-b h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.step-b p{font-size:13px;color:var(--t2);line-height:1.6}
+.step-b code{font-family:var(--mono);font-size:12px;color:var(--green);background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:1px 6px}
+
+/* SITES */
+.sites{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.site-pill{font-family:var(--mono);font-size:11px;color:var(--t2);background:var(--s2);border:1px solid var(--b2);border-radius:20px;padding:7px 15px}
+.site-pill b{color:var(--t1);font-weight:400}
+
+/* PRIVACY */
+.priv{background:var(--s1);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:22px 24px}
+.priv h3{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.priv ul{list-style:none;display:grid;gap:9px}
+.priv li{font-size:13px;color:var(--t2);line-height:1.55;padding-left:22px;position:relative}
+.priv li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
+
+/* CALLOUT */
+.note{font-size:12px;color:var(--t3);line-height:1.6;text-align:center;margin-top:24px;font-family:var(--mono)}
+
+footer{padding:30px 0 0;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b1);margin-top:50px;flex-wrap:wrap;gap:12px}
+.fl{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.07em}
+.fl b{color:var(--green)}
+.fr{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.07em}
+
+.r{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+.r.v{opacity:1;transform:translateY(0)}
+
+@media(max-width:560px){
+  .hero h1{font-size:34px}
+  .hero-sub{font-size:15px}
+  .feat{grid-template-columns:1fr}
+  footer{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="orb"></div>
+<div class="wrap">
+
+<nav class="nav">
+  <div class="nav-l">
+    <span class="nav-logo">✨</span>
+    <span class="nav-name">Better<span>Ask</span></span>
+  </div>
+  <a class="nav-back" href="index.html">← unEvilGenius Labs</a>
+</nav>
+
+<header class="hero r">
+  <div class="badge">Chrome Extension · Free · Local-first</div>
+  <h1>Autocorrect for your<br><em>AI prompts</em></h1>
+  <p class="hero-sub">
+    BetterAsk catches vague prompts <strong>before you hit send</strong> on ChatGPT, Claude, Perplexity, and Gemini — and rewrites them into clear instructions that get better answers with fewer follow-ups.
+  </p>
+  <div class="cta">
+    <a class="btn btn-primary" href="betterask-extension.zip" download>↓ Download extension</a>
+    <a class="btn btn-ghost" href="#install">How to install</a>
+  </div>
+  <div class="cta-meta">~150&nbsp;KB · <b>No account, no API key, no tracking required</b></div>
+</header>
+
+<div class="sl r">See it work</div>
+<div class="demo r">
+  <div class="demo-head">
+    <span class="demo-dot"></span>
+    <span class="demo-title">AI · <b>fix ask</b> · live rewrite</span>
+  </div>
+  <div class="demo-body">
+    <div class="row-label bad">You typed</div>
+    <div class="bubble bad" id="dBad">make this better</div>
+    <div class="arrow">fix ask</div>
+    <div class="row-label good">BetterAsk suggests</div>
+    <div class="bubble good" id="dGood"><span class="cursor"></span></div>
+  </div>
+  <div class="demo-tabs" id="dTabs"></div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">What it does</div>
+<div class="feat r">
+  <div class="fc">
+    <div class="fc-i">✨</div>
+    <h3>Fixes weak prompts</h3>
+    <p>Spots vague requests like "fix this" or "write SQL" and adds the missing goal, format, and constraints — one click to replace your text.</p>
+  </div>
+  <div class="fc">
+    <div class="fc-i">🧠</div>
+    <h3>Learns your style</h3>
+    <p>Save rules like "always lowercase SQL" or "concise, no fluff." BetterAsk applies them and suggests new ones from your editing patterns.</p>
+  </div>
+  <div class="fc">
+    <div class="fc-i">🔍</div>
+    <h3>Audits responses</h3>
+    <p>After an answer arrives, get a quality score, hallucination-risk flag, format check, and a ready-to-paste follow-up prompt.</p>
+  </div>
+  <div class="fc">
+    <div class="fc-i">📊</div>
+    <h3>Shows your wins</h3>
+    <p>A local dashboard tracks prompts improved, acceptance rate, and estimated tokens and time saved — all on your machine.</p>
+  </div>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r" id="install">Install in 4 steps</div>
+<div class="steps r">
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-b"><h4>Download &amp; unzip</h4><p>Grab <code>betterask-extension.zip</code> above and unzip it. You'll get a <code>betterask</code> folder.</p></div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-b"><h4>Open Chrome extensions</h4><p>Go to <code>chrome://extensions</code> and turn on <b>Developer mode</b> (top-right toggle).</p></div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-b"><h4>Load unpacked</h4><p>Click <b>Load unpacked</b> and select the unzipped <code>betterask</code> folder.</p></div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-b"><h4>Open an AI site</h4><p>Visit ChatGPT, Claude, Perplexity, or Gemini, type a rough prompt, and click the <b>✨ fix ask</b> pill.</p></div>
+  </div>
+</div>
+
+<div class="sites r" style="margin-top:18px">
+  <span class="site-pill">🟢 <b>ChatGPT</b></span>
+  <span class="site-pill">🟣 <b>Claude</b></span>
+  <span class="site-pill">🔵 <b>Perplexity</b></span>
+  <span class="site-pill">⚪ <b>Gemini</b></span>
+</div>
+
+<div class="div r"></div>
+
+<div class="sl r">Private by default</div>
+<div class="priv r">
+  <h3>🔒 Your prompts stay yours</h3>
+  <ul>
+    <li>Works fully offline with a built-in rewrite engine — no account, no API key needed.</li>
+    <li>Everything is stored locally in your browser. Nothing is sent to any server by default.</li>
+    <li>No analytics, no third-party tracking, ever.</li>
+    <li>Optional API mode sends prompts only to an endpoint <em>you</em> configure, with a key <em>you</em> control.</li>
+    <li>Export or delete all your data anytime from the settings page.</li>
+  </ul>
+</div>
+
+<p class="note r">
+  Heads up: AI sites change their layouts often, so prompt detection can occasionally need an update.<br>
+  Token and time savings are estimates, not guarantees. This is an early build — feedback welcome.
+</p>
+
+<footer class="r">
+  <div class="fl"><b>unEvilGenius Labs</b> · BetterAsk · 2026</div>
+  <div class="fr">Built with Claude · Local-first</div>
+</footer>
+
+</div>
+<script>
+// Live demo: real heuristic rewrites the extension actually produces
+const EXAMPLES = [
+  { bad: "make this better", good: "Rewrite the following text to be concise, natural, and direct. Remove filler phrases and AI-sounding language. Keep the same meaning. Return only the rewritten version, no commentary." },
+  { bad: "help me debug", good: "Diagnose the root cause of this bug. Provide: (1) the likely cause in one sentence, (2) the smallest safe fix as a code block, (3) how to verify the fix works." },
+  { bad: "write SQL", good: "Write a compile-safe SQL query for the following requirement. Use only the schema provided. Return one copyable SQL block. Use lowercase keywords. Add minimal comments only where logic is non-obvious." },
+  { bad: "summarize", good: "Summarize the following content in 3–5 sentences. Capture the main point, key supporting details, and any action items. Omit filler. Write for a reader who needs to act on this." },
+  { bad: "make a deck", good: "Create a slide deck outline for the following topic. Format: slide title, 3–4 concise bullets per slide, speaker note if context helps. Narrative should flow logically. Aim for 8–12 slides." },
+];
+const dBad = document.getElementById('dBad');
+const dGood = document.getElementById('dGood');
+const dTabs = document.getElementById('dTabs');
+let active = 0, typer = null;
+
+EXAMPLES.forEach((ex, i) => {
+  const b = document.createElement('button');
+  b.className = 'dtab' + (i === 0 ? ' on' : '');
+  b.textContent = '"' + ex.bad + '"';
+  b.onclick = () => show(i);
+  dTabs.appendChild(b);
+});
+
+function show(i) {
+  active = i;
+  [...dTabs.children].forEach((c, j) => c.classList.toggle('on', j === i));
+  dBad.textContent = EXAMPLES[i].bad;
+  typeOut(EXAMPLES[i].good);
+}
+
+function typeOut(text) {
+  clearInterval(typer);
+  dGood.innerHTML = '<span class="cursor"></span>';
+  let n = 0;
+  typer = setInterval(() => {
+    n += 2;
+    if (n >= text.length) { dGood.textContent = text; clearInterval(typer); return; }
+    dGood.innerHTML = text.slice(0, n) + '<span class="cursor"></span>';
+  }, 14);
+}
+
+// auto-advance every 6s until the user interacts
+let auto = setInterval(() => show((active + 1) % EXAMPLES.length), 6000);
+dTabs.addEventListener('click', () => { clearInterval(auto); }, { once: true });
+show(0);
+
+// reveal on scroll
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('v'); }), { threshold: .06 });
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
