@@ -14,6 +14,7 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { buildCompany, COMPANIES } from './lib/analyze.mjs';
+import { sampleRegulatory } from './lib/regulatory.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(HERE, '..', 'data');
@@ -219,6 +220,7 @@ async function main() {
       snapshotDate,
       window,
       records,
+      regulatory: sampleRegulatory(company),
     });
     await writeFile(
       join(DATA_DIR, 'companies', `${company.slug}.json`),

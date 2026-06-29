@@ -195,7 +195,11 @@ function buildSummary(name, total, monthly, topProducts, topIssues, topStates, t
 }
 
 // Build the full per-company object from normalized records.
-export function buildCompany({ slug, name, displayName, dataSource, snapshotDate, window, records }) {
+//
+// `regulatory` is OPTIONAL: an additive public-record cross-reference block
+// (FDIC / SEC / GLEIF) produced by scripts/lib/regulatory.mjs. When omitted the
+// record simply has no `regulatory` key, so existing consumers are unaffected.
+export function buildCompany({ slug, name, displayName, dataSource, snapshotDate, window, records, regulatory }) {
   const total = records.length;
   const monthly = monthlySeries(records, window.min, window.max);
   const topProducts = topBuckets(records, 'product');
@@ -226,7 +230,7 @@ export function buildCompany({ slug, name, displayName, dataSource, snapshotDate
     displayName, total, monthly, topProducts, topIssues, topStates, timelyRate, signal, window,
   );
 
-  return {
+  const out = {
     slug,
     name,
     display_name: displayName,
@@ -245,6 +249,9 @@ export function buildCompany({ slug, name, displayName, dataSource, snapshotDate
     signal,
     summary,
   };
+  // Additive, optional public-record cross-reference. Only attached when given.
+  if (regulatory) out.regulatory = regulatory;
+  return out;
 }
 
 // The curated set of consumer-finance companies the MVP covers. `name` must be

@@ -7,6 +7,8 @@
   "scripts": {
     "sample": "node scripts/gen-sample.mjs",
     "ingest": "node scripts/ingest-cfpb.mjs",
+    "ingest:regulatory": "node scripts/ingest-regulatory.mjs",
+    "ingest:all": "node scripts/ingest-cfpb.mjs && node scripts/ingest-regulatory.mjs",
     "build": "node build-site.mjs",
     "build:live": "node scripts/ingest-cfpb.mjs || true && node build-site.mjs",
     "preview": "node build-site.mjs && npx -y serve dist -l 5055"

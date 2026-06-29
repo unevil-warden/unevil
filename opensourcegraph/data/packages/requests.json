@@ -1,0 +1,83 @@
+{
+  "slug": "requests",
+  "name": "requests",
+  "display_name": "requests",
+  "ecosystem": "pypi",
+  "repo": "psf/requests",
+  "data_source": "sample",
+  "snapshot_date": "2026-06-29",
+  "facts": {
+    "scorecard": {
+      "score": 8.3
+    },
+    "vulns": {
+      "count": 1,
+      "max_severity": "MODERATE"
+    },
+    "maintenance": {
+      "last_release_days": 202,
+      "last_commit_days": 11,
+      "releases_past_year": 4
+    },
+    "bus_factor": {
+      "top_share": 0.44,
+      "contributors": 677
+    },
+    "license": {
+      "spdx_id": "Apache-2.0"
+    }
+  },
+  "signal": {
+    "score": 26,
+    "health_score": 74,
+    "band": "Low",
+    "components": [
+      {
+        "key": "security_posture",
+        "label": "Security posture",
+        "weight": 0.25,
+        "value": 17,
+        "evidence": "OpenSSF Scorecard 8.3/10 → inverted to 17/100 risk",
+        "source": "OpenSSF Scorecard (via deps.dev)",
+        "confidence": "high"
+      },
+      {
+        "key": "known_vulns",
+        "label": "Known vulnerabilities",
+        "weight": 0.25,
+        "value": 41.8,
+        "evidence": "1 known advisory in OSV (max severity MODERATE)",
+        "source": "OSV.dev",
+        "confidence": "high"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance / activity",
+        "weight": 0.2,
+        "value": 28.9,
+        "evidence": "202d since last release, 11d since last commit, 4 releases in the past year",
+        "source": "ecosyste.ms / GitHub",
+        "confidence": "high"
+      },
+      {
+        "key": "bus_factor",
+        "label": "Bus-factor (contributor concentration)",
+        "weight": 0.15,
+        "value": 34.3,
+        "evidence": "top contributor authored 44% of commits across 677 contributors",
+        "source": "GitHub contributors",
+        "confidence": "high"
+      },
+      {
+        "key": "license_risk",
+        "label": "License risk",
+        "weight": 0.15,
+        "value": 5,
+        "evidence": "Apache-2.0 (permissive) → permissive obligations",
+        "source": "SPDX license id (local classification)",
+        "confidence": "high"
+      }
+    ]
+  },
+  "summary": "requests carries an exploratory health/risk signal of 26/100 (Low; health 74/100), blended from five public-data sub-signals. Security posture: OpenSSF Scorecard 8.3/10 → inverted to 17/100 risk. Vulnerabilities: 1 known advisory in OSV (max severity MODERATE). Maintenance: 202d since last release, 11d since last commit, 4 releases in the past year. Apache-2.0 (permissive) → permissive obligations. This is an exploratory signal from public open-source metadata — not a security audit, a certification, or an endorsement of the project."
+}

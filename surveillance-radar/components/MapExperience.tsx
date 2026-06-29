@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Globe from "./map/Globe";
 import Controls from "./map/Controls";
+import LayerToggles from "./map/LayerToggles";
 import RecordDrawer from "./map/RecordDrawer";
 import Footer from "./layout/Footer";
 import { applyFilters, EMPTY_FILTERS, type Filters } from "../lib/atlas/filters";
@@ -26,6 +27,10 @@ export default function MapExperience({
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   // A single selected record, or a list of co-located records (stacked on one centroid).
   const [selected, setSelected] = useState<MapRecord[] | null>(null);
+  // Toggle the additional open-data cross-reference layers (off by default so the
+  // EFF Atlas stays the primary view).
+  const [showOsm, setShowOsm] = useState(false);
+  const [showWikidata, setShowWikidata] = useState(false);
 
   const filtered = useMemo(() => applyFilters(records, filters), [records, filters]);
 
@@ -51,7 +56,7 @@ export default function MapExperience({
       </header>
 
       {/* The globe */}
-      <Globe records={filtered} onSelect={setSelected} />
+      <Globe records={filtered} onSelect={setSelected} showOsm={showOsm} showWikidata={showWikidata} />
 
       {/* Floating controls */}
       <Controls
@@ -59,6 +64,14 @@ export default function MapExperience({
         onChange={setFilters}
         states={summary.states}
         technologies={summary.technologies}
+      />
+
+      {/* Cross-reference open-data layer toggles */}
+      <LayerToggles
+        showOsm={showOsm}
+        showWikidata={showWikidata}
+        onToggleOsm={() => setShowOsm((v) => !v)}
+        onToggleWikidata={() => setShowWikidata((v) => !v)}
       />
 
       {/* Detail drawer */}

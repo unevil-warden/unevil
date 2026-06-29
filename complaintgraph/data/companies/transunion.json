@@ -259,5 +259,43 @@
       }
     ]
   },
-  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,757 complaints about TransUnion. Volume is steady (last 3 months averaged 132 per month versus 128 before). The most common issue is \"Incorrect information on your report\" (47% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 98% of cases; 87.4% of closed cases ended without relief. Overall risk signal: Elevated (57/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion."
+  "summary": "Between 2025-01-01 and 2026-06-29, the CFPB published 1,757 complaints about TransUnion. Volume is steady (last 3 months averaged 132 per month versus 128 before). The most common issue is \"Incorrect information on your report\" (47% of complaints), concentrated in credit reporting, credit repair services, or other personal consumer reports. The company responded on time to 98% of cases; 87.4% of closed cases ended without relief. Overall risk signal: Elevated (57/100). This is an exploratory signal from public complaint data, not a regulatory, legal, or investment conclusion.",
+  "regulatory": {
+    "data_source": "sample",
+    "fdic": null,
+    "sec": {
+      "cik": "0001552033",
+      "entity_name": "TransUnion",
+      "recent_filings": [
+        {
+          "form": "10-K",
+          "date": "2026-02-12",
+          "primary_doc": "tru-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "date": "2026-05-09",
+          "primary_doc": "tru-20260331.htm"
+        }
+      ]
+    },
+    "lei": {
+      "lei": "529900XSTAS5T2ELEW68",
+      "legal_name": "TransUnion",
+      "jurisdiction": "US-DE",
+      "status": "ACTIVE",
+      "registration_status": "ISSUED"
+    },
+    "sources": [
+      {
+        "label": "SEC EDGAR",
+        "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany"
+      },
+      {
+        "label": "GLEIF LEI Search",
+        "url": "https://search.gleif.org/"
+      }
+    ],
+    "note": "SAMPLE public-record cross-reference — synthetic, illustrative values for offline demo. Replaced by live FDIC / SEC EDGAR / GLEIF lookups when ingested in CI."
+  }
 }

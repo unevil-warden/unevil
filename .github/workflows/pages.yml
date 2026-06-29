@@ -5,6 +5,7 @@
 #   /jobagent/       -> JobAgent demo (self-contained static page)
 #   /betterask/      -> BetterAsk download page + extension zip
 #   /complaintgraph/ -> ComplaintGraph dashboard (static + freshly baked CFPB data)
+#   /opensourcegraph/-> OpenSourceGraph dashboard (static + freshly baked OSS-health data)
 name: Deploy project sites to Pages
 
 on:
@@ -66,6 +67,21 @@ jobs:
         timeout-minutes: 6
         run: node scripts/ingest-cfpb.mjs
 
+      - name: Refresh OpenSourceGraph data from open-source APIs
+        # Pull live open-source health signals (deps.dev / OSV / ecosyste.ms /
+        # GitHub). Like the CFPB step, this is best-effort: the ingest only
+        # overwrites when it gathers enough live data, otherwise the committed
+        # sample dataset is kept so the page always renders (clearly labeled as
+        # sample). Bounded by per-request timeouts + a budget in the script,
+        # plus this hard step timeout as a final backstop. GITHUB_TOKEN (the
+        # built-in Actions token) raises the GitHub API rate limit.
+        working-directory: opensourcegraph
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ingest.mjs
+
       - name: Assemble multi-page site
         run: |
           rm -rf _site
@@ -89,6 +105,10 @@ jobs:
           mkdir -p _site/complaintgraph
           cp -r complaintgraph/src/. _site/complaintgraph/
           cp -r complaintgraph/data _site/complaintgraph/data
+          # OpenSourceGraph dashboard + baked data at /opensourcegraph/
+          mkdir -p _site/opensourcegraph
+          cp -r opensourcegraph/src/. _site/opensourcegraph/
+          cp -r opensourcegraph/data _site/opensourcegraph/data
 
       - name: Setup Pages
         # enablement: true makes this action create/enable the Pages site (with
