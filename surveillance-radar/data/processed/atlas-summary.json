@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-06-29T16:43:25.349Z",
+  "totalRecords": 48,
+  "skippedNoLocation": 0,
+  "geocodeSources": {
+    "csv": 0,
+    "city": 48,
+    "county": 0,
+    "state": 0
+  },
+  "uniqueAgencies": 48,
+  "uniqueTechnologies": 11,
+  "uniqueStates": 22,
+  "technologies": [
+    "Aerial Surveillance",
+    "Automated License Plate Readers",
+    "Body-worn Cameras",
+    "Camera Registry",
+    "Cell-site Simulators",
+    "Drones / UAS",
+    "Face Recognition",
+    "Gunshot Detection",
+    "Predictive Policing",
+    "Real-Time Crime Center",
+    "Video Analytics"
+  ],
+  "states": [
+    "AZ",
+    "CA",
+    "CO",
+    "FL",
+    "GA",
+    "HI",
+    "IL",
+    "IN",
+    "LA",
+    "MA",
+    "MD",
+    "MI",
+    "MN",
+    "NC",
+    "NV",
+    "NY",
+    "OH",
+    "OR",
+    "PA",
+    "TN",
+    "TX",
+    "WA"
+  ],
+  "topTechnologies": [
+    {
+      "label": "Automated License Plate Readers",
+      "count": 11
+    },
+    {
+      "label": "Body-worn Cameras",
+      "count": 9
+    },
+    {
+      "label": "Face Recognition",
+      "count": 7
+    },
+    {
+      "label": "Drones / UAS",
+      "count": 6
+    },
+    {
+      "label": "Gunshot Detection",
+      "count": 5
+    },
+    {
+      "label": "Real-Time Crime Center",
+      "count": 3
+    },
+    {
+      "label": "Video Analytics",
+      "count": 2
+    },
+    {
+      "label": "Camera Registry",
+      "count": 2
+    },
+    {
+      "label": "Predictive Policing",
+      "count": 1
+    },
+    {
+      "label": "Cell-site Simulators",
+      "count": 1
+    }
+  ],
+  "topStates": [
+    {
+      "label": "CA",
+      "count": 6
+    },
+    {
+      "label": "TX",
+      "count": 5
+    },
+    {
+      "label": "NY",
+      "count": 3
+    },
+    {
+      "label": "AZ",
+      "count": 3
+    },
+    {
+      "label": "WA",
+      "count": 3
+    },
+    {
+      "label": "FL",
+      "count": 3
+    },
+    {
+      "label": "IL",
+      "count": 2
+    },
+    {
+      "label": "OR",
+      "count": 2
+    },
+    {
+      "label": "CO",
+      "count": 2
+    },
+    {
+      "label": "MA",
+      "count": 2
+    }
+  ],
+  "topVendors": [
+    {
+      "label": "Axon",
+      "count": 9
+    },
+    {
+      "label": "Flock Safety",
+      "count": 7
+    },
+    {
+      "label": "DJI",
+      "count": 6
+    },
+    {
+      "label": "Motorola Solutions",
+      "count": 6
+    },
+    {
+      "label": "ShotSpotter",
+      "count": 5
+    },
+    {
+      "label": "Vigilant Solutions",
+      "count": 4
+    },
+    {
+      "label": "Clearview AI",
+      "count": 2
+    },
+    {
+      "label": "Palantir",
+      "count": 2
+    },
+    {
+      "label": "Ring",
+      "count": 2
+    },
+    {
+      "label": "Microsoft",
+      "count": 1
+    }
+  ],
+  "attribution": "Data source: Electronic Frontier Foundation, Atlas of Surveillance (CC BY)."
+}
