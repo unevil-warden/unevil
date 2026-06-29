@@ -19,6 +19,10 @@ export default function Settings({ ctx }) {
   const setP = (k, v) => setProfile({ ...profile, [k]: v })
   const join = arr => (Array.isArray(arr) ? arr.join(', ') : (arr || ''))
   const split = s => s.split(',').map(x => x.trim()).filter(Boolean)
+  const sf = settings.search_filters || {}
+  const ds = settings.draft_style || {}
+  const setSF = (k, v) => setSettings({ ...settings, search_filters: { ...sf, [k]: v } })
+  const setDS = (k, v) => setSettings({ ...settings, draft_style: { ...ds, [k]: v } })
 
   async function saveSettings() {
     const payload = { ...settings }
@@ -87,6 +91,64 @@ export default function Settings({ ctx }) {
       </div>
 
       <div className="ssection">
+        <div className="sec-title">Job-search filters</div>
+        <div className="panel">
+          <Field label="Remote only" desc="Only surface remote roles">
+            <Toggle on={!!sf.remote_only} onClick={() => setSF('remote_only', !sf.remote_only)} />
+          </Field>
+          <Field label="Employment type">
+            <select className="sinput" value={sf.employment_type || 'any'} onChange={e => setSF('employment_type', e.target.value)}>
+              <option value="any">any</option>
+              <option value="full-time">full-time</option>
+              <option value="contract">contract</option>
+              <option value="part-time">part-time</option>
+            </select>
+          </Field>
+          <Field label="Must-have keywords" desc="comma-separated; a role must mention all of these">
+            <input className="sinput" value={join(sf.include_keywords)} onChange={e => setSF('include_keywords', split(e.target.value))} />
+          </Field>
+          <Field label="Exclude keywords" desc="comma-separated; drop roles mentioning any of these">
+            <input className="sinput" value={join(sf.exclude_keywords)} onChange={e => setSF('exclude_keywords', split(e.target.value))} />
+          </Field>
+          <Field label="Avoid companies" desc="comma-separated company names to skip">
+            <input className="sinput" value={join(sf.avoid_companies)} onChange={e => setSF('avoid_companies', split(e.target.value))} />
+          </Field>
+          <Field label="Enforce minimum salary" desc="skip roles clearly below your profile's minimum">
+            <Toggle on={!!sf.enforce_min_salary} onClick={() => setSF('enforce_min_salary', !sf.enforce_min_salary)} />
+          </Field>
+        </div>
+        <div className="actions" style={{ marginTop: 14 }}><button className="btn solid" onClick={saveSettings}>Save filters</button></div>
+      </div>
+
+      <div className="ssection">
+        <div className="sec-title">Draft style</div>
+        <div className="panel">
+          <Field label="Tone">
+            <select className="sinput" value={ds.tone || 'warm'} onChange={e => setDS('tone', e.target.value)}>
+              <option value="warm">warm</option>
+              <option value="formal">formal</option>
+              <option value="concise">concise</option>
+            </select>
+          </Field>
+          <Field label="Reply length">
+            <select className="sinput" value={ds.length || 'medium'} onChange={e => setDS('length', e.target.value)}>
+              <option value="short">short</option>
+              <option value="medium">medium</option>
+              <option value="long">long</option>
+            </select>
+          </Field>
+          <Field label="Auto-draft replies" desc="draft replies automatically right after Scan inbox">
+            <Toggle on={!!ds.auto_draft_replies} onClick={() => setDS('auto_draft_replies', !ds.auto_draft_replies)} />
+          </Field>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label className="sec-title" style={{ display: 'block', marginBottom: 8 }}>Email signature</label>
+          <textarea className="sinput" style={{ width: '100%', minHeight: 70 }} placeholder={'Best,\nYour Name'} value={ds.signature || ''} onChange={e => setDS('signature', e.target.value)} />
+        </div>
+        <div className="actions" style={{ marginTop: 14 }}><button className="btn solid" onClick={saveSettings}>Save draft style</button></div>
+      </div>
+
+      <div className="ssection">
         <div className="sec-title">Estimated token usage</div>
         {usage?.by_operation?.length ? (
           <div className="panel">
@@ -110,4 +172,8 @@ function Field({ label, desc, children }) {
       {children}
     </div>
   )
+}
+
+function Toggle({ on, onClick }) {
+  return <div className={`tog${on ? ' on' : ''}`} role="switch" aria-checked={on} onClick={onClick} />
 }
