@@ -4,7 +4,7 @@ import path from 'path';
 const { chromium } = pw;
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const file = 'file://' + path.resolve(here, '../../index.html');
+const file = 'file://' + path.resolve(here, 'index.html');
 const browser = await chromium.launch();
 // iPhone 14-ish portrait
 const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true });

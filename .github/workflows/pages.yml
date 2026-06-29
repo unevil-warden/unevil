@@ -1,6 +1,8 @@
-# Build and publish the sub-project sites to GitHub Pages:
-#   /            -> Surveillance Radar (Next.js static export)
+# Build and publish the unEvilGenius Labs portfolio to GitHub Pages:
+#   /            -> Portfolio landing page (index.html)
+#   /radar/      -> Surveillance Radar (Next.js static export)
 #   /replygraph/ -> ReplyGraph demo (self-contained static page)
+#   /betterask/  -> BetterAsk download page + extension zip
 name: Deploy project sites to Pages
 
 on:
@@ -42,10 +44,10 @@ jobs:
 
       - name: Build static export
         working-directory: surveillance-radar
-        # Project pages are served from /<repo>/, so the app must be built with
+        # The radar is served from /<repo>/radar/, so the app must be built with
         # that base path baked into asset and data URLs.
         env:
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/radar
         run: |
           pnpm install --frozen-lockfile
           pnpm ingest:atlas
@@ -55,11 +57,18 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site
-          # Surveillance Radar at the site root
-          cp -r surveillance-radar/out/. _site/
+          # Portfolio landing page at the site root
+          cp index.html _site/index.html
+          # Surveillance Radar at /radar/
+          mkdir -p _site/radar
+          cp -r surveillance-radar/out/. _site/radar/
           # ReplyGraph self-contained demo at /replygraph/
           mkdir -p _site/replygraph
-          cp index.html _site/replygraph/index.html
+          cp replygraph/demo/index.html _site/replygraph/index.html
+          # BetterAsk download page + extension zip at /betterask/
+          mkdir -p _site/betterask
+          cp betterask.html _site/betterask/index.html
+          cp betterask-extension.zip _site/betterask/betterask-extension.zip
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

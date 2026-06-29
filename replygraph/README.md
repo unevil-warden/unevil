@@ -7,8 +7,9 @@ tone, extracts follow-ups, and exports summaries to Markdown / Obsidian.
 **Local-first. Read-only. No auto-send.** Your messages stay on your Mac.
 
 > There is also a static, sample-data **demo** of the interface (no backend, no
-> real messages) at the repo root `index.html`, published via GitHub Pages. The
-> instructions below are for the *real* app under `replygraph/`.
+> real messages) at [`replygraph/demo/index.html`](./demo/index.html), published
+> via GitHub Pages at `/replygraph/`. The instructions below are for the *real*
+> app under `replygraph/`.
 
 ---
 
