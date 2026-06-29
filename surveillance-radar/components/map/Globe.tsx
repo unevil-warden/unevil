@@ -15,7 +15,8 @@ function buildStyle(): maplibregl.StyleSpecification {
     sources: {
       // Land outlines rendered from a bundled GeoJSON — fully self-contained, no tile
       // server, no API keys. (maplibre falls back to local glyph rendering for labels.)
-      land: { type: "geojson", data: "/world.geojson" },
+      // BASE prefix supports serving under a subpath (e.g. GitHub Pages).
+      land: { type: "geojson", data: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/world.geojson` },
     },
     layers: [
       { id: "bg", type: "background", paint: { "background-color": THEME.water } },
