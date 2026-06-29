@@ -16,6 +16,7 @@ more get added as they ship.
 | Portfolio (landing) | https://unevil-warden.github.io/unevil/ |
 | Surveillance Radar | https://unevil-warden.github.io/unevil/radar/ |
 | ReplyGraph demo | https://unevil-warden.github.io/unevil/replygraph/ |
+| JobAgent demo | https://unevil-warden.github.io/unevil/jobagent/ |
 | BetterAsk download | https://unevil-warden.github.io/unevil/betterask/ |
 
 ---
@@ -26,6 +27,7 @@ more get added as they ship.
 |---|---|---|---|---|
 | **Surveillance Radar** | An interactive 3D globe ("FlightRadar24 for surveillance tech") visualizing the EFF *Atlas of Surveillance* dataset — public data only, with attribution. | Next.js · MapLibre | [`surveillance-radar/`](./surveillance-radar/) · [live](https://unevil-warden.github.io/unevil/radar/) | 🌐 Live site |
 | **ReplyGraph** | Local-first macOS app that reads *your own* iMessage history, ranks which conversations need attention, drafts replies in your voice, flags risky tone, and extracts follow-ups. Read-only, copy-to-clipboard only — never auto-sends. | Python (FastAPI) · React (Vite) | [`replygraph/`](./replygraph/) · [live demo](https://unevil-warden.github.io/unevil/replygraph/) | ✅ In repo + live demo |
+| **JobAgent** | Local-first job-search dashboard tied to a *Claude agent* that finds matched roles (web search), drafts applications and email replies in your voice, and tracks your pipeline. Draft-and-approve — never submits or sends for you; Gmail replies are saved as drafts. | Python (FastAPI) · React (Vite) | [`jobagent/`](./jobagent/) · [live demo](https://unevil-warden.github.io/unevil/jobagent/) | ✅ In repo + live demo |
 | **BetterAsk** | A local-first Chrome extension that's "autocorrect for AI prompts" — catches vague prompts before you send them and suggests clearer versions. | Vite · React · TypeScript | [`betterask/`](./betterask/) · [download page](./betterask.html) | 📄 Download page live |
 
 > The published front page is the **portfolio landing page** ([`index.html`](./index.html)),
