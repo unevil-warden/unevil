@@ -90,6 +90,30 @@ Then open http://localhost:5055. Serve over HTTP rather than opening
 
 ---
 
+## Hosting it anywhere (off GitHub Pages)
+
+ComplaintGraph is a fully static site with relative paths, so it runs on any
+static host. `npm run build` assembles everything into `dist/`; `npm run
+build:live` first pulls a fresh CFPB snapshot (falling back to the committed
+sample if the API is slow), then assembles.
+
+**Drag & drop (fastest):** run `npm run build`, then drop the `dist/` folder
+onto <https://app.netlify.com/drop> or `npx surge dist`.
+
+**Connected repo with live data + auto-deploy** (works with private repos, no
+plan upgrade):
+
+| Host | Settings |
+|---|---|
+| **Netlify** | Uses the committed [`netlify.toml`](./netlify.toml) — just import the repo. |
+| **Vercel** | Root directory `complaintgraph` (reads [`vercel.json`](./vercel.json)). |
+| **Cloudflare Pages** | Root dir `complaintgraph`, build `npm run build:live`, output `dist`. |
+
+All three run the build (including the live CFPB ingest) in their own CI, so you
+get fresh data on every deploy.
+
+---
+
 ## Data source
 
 [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/)
