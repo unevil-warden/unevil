@@ -56,10 +56,13 @@ jobs:
 
       - name: Refresh ComplaintGraph data from CFPB
         # Pull a live snapshot of the public CFPB Consumer Complaint Database.
-        # If the fetch fails for any reason, the committed sample dataset is
-        # kept so the page always renders (clearly labeled as sample).
+        # If the fetch fails, is slow, or hangs, the committed sample dataset is
+        # kept so the page always renders (clearly labeled as sample). The step
+        # is bounded three ways: per-request timeout + total budget in the
+        # script, plus this hard step timeout as a final backstop.
         working-directory: complaintgraph
         continue-on-error: true
+        timeout-minutes: 6
         run: node scripts/ingest-cfpb.mjs
 
       - name: Assemble multi-page site
