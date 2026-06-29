@@ -57,14 +57,13 @@ jobs:
 
       - name: Refresh ComplaintGraph data from CFPB
         # Pull a live snapshot of the public CFPB Consumer Complaint Database.
-        # If the fetch fails for any reason, the committed sample dataset is
-        # kept so the page always renders (clearly labeled as sample).
+        # If the fetch fails, is slow, or hangs, the committed sample dataset is
+        # kept so the page always renders (clearly labeled as sample). The step
+        # is bounded three ways: per-request timeout + total budget in the
+        # script, plus this hard step timeout as a final backstop.
         working-directory: complaintgraph
-        # Cap the live fetch so a slow/hanging CFPB API can't stall (and get the
-        # whole deploy cancelled). On timeout, continue-on-error keeps the
-        # committed sample dataset and the build proceeds to publish.
         continue-on-error: true
-        timeout-minutes: 2
+        timeout-minutes: 6
         run: node scripts/ingest-cfpb.mjs
 
       - name: Assemble multi-page site
@@ -92,7 +91,12 @@ jobs:
           cp -r complaintgraph/data _site/complaintgraph/data
 
       - name: Setup Pages
+        # enablement: true makes this action create/enable the Pages site (with
+        # GitHub Actions as the source) if it isn't already, instead of 404ing
+        # when no Pages site exists yet. Requires the pages: write permission set above.
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -21,8 +21,14 @@ const DATA_DIR = join(HERE, '..', 'data');
 const API = 'https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/';
 
 const MONTHS = Number(process.env.CG_MONTHS || 18);
-const MAX_PER_COMPANY = Number(process.env.CG_MAX_PER_COMPANY || 5000);
+const MAX_PER_COMPANY = Number(process.env.CG_MAX_PER_COMPANY || 2000);
 const PAGE = 100;
+const REQUEST_TIMEOUT_MS = Number(process.env.CG_REQUEST_TIMEOUT_MS || 20000);
+// Hard wall-clock budget for the whole ingest so a slow/hanging API can never
+// stall the deploy. When it trips, whatever was fetched so far is used and the
+// rest falls back to committed sample data.
+const TOTAL_BUDGET_MS = Number(process.env.CG_TOTAL_BUDGET_MS || 240000);
+const START = Date.now();
 
 function isoDate(d) {
   return d.toISOString().slice(0, 10);
@@ -47,9 +53,16 @@ async function fetchPage(companyName, window, frm) {
   url.searchParams.set('sort', 'created_date_desc');
   url.searchParams.set('format', 'json');
 
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${companyName} (frm=${frm})`);
-  const json = await res.json();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  let json;
+  try {
+    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: ctrl.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${companyName} (frm=${frm})`);
+    json = await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
   const hits = json?.hits?.hits ?? [];
   const totalRaw = json?.hits?.total;
   const total = typeof totalRaw === 'object' ? totalRaw?.value ?? 0 : totalRaw ?? 0;
@@ -74,6 +87,10 @@ async function fetchCompany(company, window) {
   let frm = 0;
   let total = Infinity;
   while (frm < total && records.length < MAX_PER_COMPANY) {
+    if (Date.now() - START > TOTAL_BUDGET_MS) {
+      console.warn(`  (time budget reached — stopping ${company.displayName} at ${records.length})`);
+      break;
+    }
     const { hits, total: t } = await fetchPage(company.name, window, frm);
     total = t;
     if (!hits.length) break;
@@ -88,57 +105,55 @@ async function main() {
   const snapshotDate = isoDate(new Date());
   await mkdir(join(DATA_DIR, 'companies'), { recursive: true });
 
-  const indexEntries = [];
-  let ok = 0;
-
+  // Build everything in memory first. We only touch disk if ALL companies
+  // succeed with data — so a slow/failed ingest leaves the committed sample
+  // dataset fully intact and consistent (rather than a mix of live + empty).
+  const built = [];
   for (const company of COMPANIES) {
-    try {
-      process.stdout.write(`Fetching ${company.displayName}… `);
-      const records = await fetchCompany(company, window);
-      const built = buildCompany({
-        slug: company.slug,
-        name: company.name,
-        displayName: company.displayName,
-        dataSource: 'cfpb',
-        snapshotDate,
-        window,
-        records,
-      });
-      await writeFile(
-        join(DATA_DIR, 'companies', `${company.slug}.json`),
-        `${JSON.stringify(built, null, 2)}\n`,
-      );
-      indexEntries.push({
-        slug: company.slug,
-        display_name: company.displayName,
-        name: company.name,
-        kind: company.kind,
-        total_complaints: built.total_complaints,
-        signal_score: built.signal.score,
-        signal_band: built.signal.band,
-      });
-      ok += 1;
-      console.log(`${built.total_complaints} complaints, signal ${built.signal.score}`);
-    } catch (err) {
-      // Fail loud per-company but keep going; the workflow keeps the committed
-      // sample file for any company that errors here.
-      console.error(`FAILED: ${company.displayName}: ${err.message}`);
+    process.stdout.write(`Fetching ${company.displayName}… `);
+    const records = await fetchCompany(company, window);
+    if (records.length === 0) {
+      throw new Error(`no records for ${company.displayName} (slow API or time budget) — keeping committed sample data`);
     }
+    const company_built = buildCompany({
+      slug: company.slug,
+      name: company.name,
+      displayName: company.displayName,
+      dataSource: 'cfpb',
+      snapshotDate,
+      window,
+      records,
+    });
+    built.push(company_built);
+    console.log(`${company_built.total_complaints} complaints, signal ${company_built.signal.score}`);
   }
 
-  if (ok === 0) {
-    throw new Error('All company fetches failed — keeping committed sample data.');
+  // All good — commit every file.
+  for (const b of built) {
+    await writeFile(
+      join(DATA_DIR, 'companies', `${b.slug}.json`),
+      `${JSON.stringify(b, null, 2)}\n`,
+    );
   }
-
   const index = {
     generated: snapshotDate,
     data_source: 'cfpb',
     window,
     note: 'Public CFPB Consumer Complaint Database snapshot. Signals are exploratory, not verdicts.',
-    companies: indexEntries.sort((a, b) => b.signal_score - a.signal_score),
+    companies: built
+      .map((b) => ({
+        slug: b.slug,
+        display_name: b.display_name,
+        name: b.name,
+        kind: COMPANIES.find((c) => c.slug === b.slug)?.kind,
+        total_complaints: b.total_complaints,
+        signal_score: b.signal.score,
+        signal_band: b.signal.band,
+      }))
+      .sort((a, b) => b.signal_score - a.signal_score),
   };
   await writeFile(join(DATA_DIR, 'index.json'), `${JSON.stringify(index, null, 2)}\n`);
-  console.log(`\nWrote ${ok}/${COMPANIES.length} companies to ${DATA_DIR}`);
+  console.log(`\nWrote ${built.length}/${COMPANIES.length} companies to ${DATA_DIR}`);
 }
 
 main().catch((err) => {
