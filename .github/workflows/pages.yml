@@ -60,7 +60,11 @@ jobs:
         # If the fetch fails for any reason, the committed sample dataset is
         # kept so the page always renders (clearly labeled as sample).
         working-directory: complaintgraph
+        # Cap the live fetch so a slow/hanging CFPB API can't stall (and get the
+        # whole deploy cancelled). On timeout, continue-on-error keeps the
+        # committed sample dataset and the build proceeds to publish.
         continue-on-error: true
+        timeout-minutes: 2
         run: node scripts/ingest-cfpb.mjs
 
       - name: Assemble multi-page site

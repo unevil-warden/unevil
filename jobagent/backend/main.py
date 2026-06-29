@@ -190,10 +190,30 @@ def agent_scan_inbox(db: Session = Depends(get_db)):
             if not exists:
                 db.add(Followup(task_text=ftext, direction=cls["followup_direction"],
                                 related_thread_id=row.id, confidence=cls.get("mode")))
-    summary = f"Scanned {len(threads)} thread(s), {created} new ({mode})."
+    db.flush()
+    # Optionally draft replies right away for anything that needs one.
+    auto_drafted = 0
+    if load_settings().get("draft_style", {}).get("auto_draft_replies"):
+        profile = get_profile()
+        pending = db.query(EmailThread).filter(EmailThread.needs_response == True).all()  # noqa: E712
+        for t in pending:
+            if _latest_draft(db, t.id):
+                continue
+            result = draft_reply(thread_dict(t), profile)
+            gmail_id = gmail_client.create_draft(thread_dict(t), result["draft_text"])
+            db.add(EmailDraft(
+                thread_id=t.id, draft_text=result["draft_text"], status="draft",
+                gmail_draft_id=gmail_id, confidence=result.get("confidence"),
+                reason=result.get("reason"), mode=result.get("mode"),
+            ))
+            auto_drafted += 1
+
+    extra = f", auto-drafted {auto_drafted} repl(ies)" if auto_drafted else ""
+    summary = f"Scanned {len(threads)} thread(s), {created} new ({mode}){extra}."
     db.add(AgentRun(kind="scan-inbox", summary=summary, mode=mode, items_created=created))
     db.commit()
-    return {"scanned": len(threads), "created": created, "mode": mode, "summary": summary}
+    return {"scanned": len(threads), "created": created, "auto_drafted": auto_drafted,
+            "mode": mode, "summary": summary}
 
 
 @app.post("/agent/draft-replies")

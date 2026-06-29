@@ -41,6 +41,31 @@ def get_model() -> str:
     return load_settings().get("model", "claude-opus-4-8")
 
 
+DEFAULT_SEARCH_FILTERS = {
+    "remote_only": False,
+    "include_keywords": [],
+    "exclude_keywords": [],
+    "avoid_companies": [],
+    "enforce_min_salary": False,
+    "employment_type": "any",
+}
+
+DEFAULT_DRAFT_STYLE = {
+    "tone": "warm",
+    "length": "medium",
+    "signature": "",
+    "auto_draft_replies": False,
+}
+
+
+def get_search_filters() -> dict:
+    return {**DEFAULT_SEARCH_FILTERS, **(load_settings().get("search_filters") or {})}
+
+
+def get_draft_style() -> dict:
+    return {**DEFAULT_DRAFT_STYLE, **(load_settings().get("draft_style") or {})}
+
+
 def get_gmail_paths() -> dict:
     """Resolve Gmail OAuth file paths from settings (expanded, may not exist)."""
     s = load_settings()

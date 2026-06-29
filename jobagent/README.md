@@ -22,6 +22,9 @@ drafts; you review and approve.
 - **Drafts email replies** in your voice and saves them as **Gmail drafts** (unsent).
 - **Tracks your pipeline** — open jobs, application drafts, applied, interviewing — plus the
   follow-ups you owe (and that are owed to you).
+- **Tunable** — Settings exposes job-search filters (remote-only, must-have / exclude keywords,
+  companies to avoid, employment type, enforce minimum salary) and draft style (tone, length,
+  email signature, and auto-draft replies right after a scan).
 - **Offline heuristics or real Claude** — runs fully without an API key (mock mode); add your
   key for real search and drafting.
 
