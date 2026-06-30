@@ -109,6 +109,15 @@ jobs:
           mkdir -p _site/opensourcegraph
           cp -r opensourcegraph/src/. _site/opensourcegraph/
           cp -r opensourcegraph/data _site/opensourcegraph/data
+          # Sub-path aliases for the self-contained demos, so links that mirror
+          # the repo's own folder layout (e.g. /replygraph/demo/, /jobagent/demo/,
+          # /betterask.html) resolve to the same page as the clean paths above.
+          # Only done for single-file pages where it can't break relative asset
+          # or data paths; ComplaintGraph/OpenSourceGraph stay at their clean
+          # paths since their data is loaded relative to the page.
+          mkdir -p _site/replygraph/demo && cp _site/replygraph/index.html _site/replygraph/demo/index.html
+          mkdir -p _site/jobagent/demo && cp _site/jobagent/index.html _site/jobagent/demo/index.html
+          cp betterask.html _site/betterask.html
 
       - name: Setup Pages
         # enablement: true makes this action create/enable the Pages site (with
