@@ -1,0 +1,83 @@
+{
+  "slug": "express",
+  "name": "express",
+  "display_name": "express",
+  "ecosystem": "npm",
+  "repo": "expressjs/express",
+  "data_source": "sample",
+  "snapshot_date": "2026-06-29",
+  "facts": {
+    "scorecard": {
+      "score": 6.9
+    },
+    "vulns": {
+      "count": 0,
+      "max_severity": null
+    },
+    "maintenance": {
+      "last_release_days": 122,
+      "last_commit_days": 10,
+      "releases_past_year": 6
+    },
+    "bus_factor": {
+      "top_share": 0.32,
+      "contributors": 278
+    },
+    "license": {
+      "spdx_id": "MIT"
+    }
+  },
+  "signal": {
+    "score": 15,
+    "health_score": 85,
+    "band": "Low",
+    "components": [
+      {
+        "key": "security_posture",
+        "label": "Security posture",
+        "weight": 0.25,
+        "value": 31,
+        "evidence": "OpenSSF Scorecard 6.9/10 → inverted to 31/100 risk",
+        "source": "OpenSSF Scorecard (via deps.dev)",
+        "confidence": "high"
+      },
+      {
+        "key": "known_vulns",
+        "label": "Known vulnerabilities",
+        "weight": 0.25,
+        "value": 0,
+        "evidence": "no known advisories in OSV",
+        "source": "OSV.dev",
+        "confidence": "high"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance / activity",
+        "weight": 0.2,
+        "value": 19.6,
+        "evidence": "122d since last release, 10d since last commit, 6 releases in the past year",
+        "source": "ecosyste.ms / GitHub",
+        "confidence": "high"
+      },
+      {
+        "key": "bus_factor",
+        "label": "Bus-factor (contributor concentration)",
+        "weight": 0.15,
+        "value": 17.1,
+        "evidence": "top contributor authored 32% of commits across 278 contributors",
+        "source": "GitHub contributors",
+        "confidence": "high"
+      },
+      {
+        "key": "license_risk",
+        "label": "License risk",
+        "weight": 0.15,
+        "value": 5,
+        "evidence": "MIT (permissive) → permissive obligations",
+        "source": "SPDX license id (local classification)",
+        "confidence": "high"
+      }
+    ]
+  },
+  "summary": "express carries an exploratory health/risk signal of 15/100 (Low; health 85/100), blended from five public-data sub-signals. Security posture: OpenSSF Scorecard 6.9/10 → inverted to 31/100 risk. Vulnerabilities: no known advisories in OSV. Maintenance: 122d since last release, 10d since last commit, 6 releases in the past year. MIT (permissive) → permissive obligations. This is an exploratory signal from public open-source metadata — not a security audit, a certification, or an endorsement of the project."
+}

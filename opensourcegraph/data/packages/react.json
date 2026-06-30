@@ -1,0 +1,83 @@
+{
+  "slug": "react",
+  "name": "react",
+  "display_name": "react",
+  "ecosystem": "npm",
+  "repo": "facebook/react",
+  "data_source": "sample",
+  "snapshot_date": "2026-06-29",
+  "facts": {
+    "scorecard": {
+      "score": 8.9
+    },
+    "vulns": {
+      "count": 0,
+      "max_severity": null
+    },
+    "maintenance": {
+      "last_release_days": 36,
+      "last_commit_days": 1,
+      "releases_past_year": 14
+    },
+    "bus_factor": {
+      "top_share": 0.22,
+      "contributors": 1658
+    },
+    "license": {
+      "spdx_id": "MIT"
+    }
+  },
+  "signal": {
+    "score": 4,
+    "health_score": 96,
+    "band": "Low",
+    "components": [
+      {
+        "key": "security_posture",
+        "label": "Security posture",
+        "weight": 0.25,
+        "value": 11,
+        "evidence": "OpenSSF Scorecard 8.9/10 → inverted to 11/100 risk",
+        "source": "OpenSSF Scorecard (via deps.dev)",
+        "confidence": "high"
+      },
+      {
+        "key": "known_vulns",
+        "label": "Known vulnerabilities",
+        "weight": 0.25,
+        "value": 0,
+        "evidence": "no known advisories in OSV",
+        "source": "OSV.dev",
+        "confidence": "high"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance / activity",
+        "weight": 0.2,
+        "value": 2.7,
+        "evidence": "36d since last release, 1d since last commit, 14 releases in the past year",
+        "source": "ecosyste.ms / GitHub",
+        "confidence": "high"
+      },
+      {
+        "key": "bus_factor",
+        "label": "Bus-factor (contributor concentration)",
+        "weight": 0.15,
+        "value": 2.9,
+        "evidence": "top contributor authored 22% of commits across 1658 contributors",
+        "source": "GitHub contributors",
+        "confidence": "high"
+      },
+      {
+        "key": "license_risk",
+        "label": "License risk",
+        "weight": 0.15,
+        "value": 5,
+        "evidence": "MIT (permissive) → permissive obligations",
+        "source": "SPDX license id (local classification)",
+        "confidence": "high"
+      }
+    ]
+  },
+  "summary": "react carries an exploratory health/risk signal of 4/100 (Low; health 96/100), blended from five public-data sub-signals. Security posture: OpenSSF Scorecard 8.9/10 → inverted to 11/100 risk. Vulnerabilities: no known advisories in OSV. Maintenance: 36d since last release, 1d since last commit, 14 releases in the past year. MIT (permissive) → permissive obligations. This is an exploratory signal from public open-source metadata — not a security audit, a certification, or an endorsement of the project."
+}
