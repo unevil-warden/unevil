@@ -8,8 +8,12 @@ matched to your profile, drafts applications and email replies in your voice, an
 drafts; you review and approve.
 
 > There is also a static, sample-data **demo** of the interface (no backend, no real data) at
-> [`jobagent/demo/index.html`](./demo/index.html), published via GitHub Pages at `/jobagent/`.
-> The instructions below are for the *real* app.
+> [`jobagent/demo/index.html`](./demo/index.html). The instructions below are for the *real* app.
+>
+> **Instant preview** (no setup): https://raw.githack.com/unevil-warden/unevil/main/jobagent/demo/index.html
+> — a third-party CDN render of the committed demo file. The canonical home is GitHub Pages at
+> `https://unevil-warden.github.io/unevil/jobagent/` once Pages is enabled for the repo
+> (Settings → Pages → Source: GitHub Actions).
 
 ---
 
