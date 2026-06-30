@@ -17,7 +17,7 @@ more get added as they ship.
 | ComplaintGraph | https://unevil-warden.github.io/unevil/complaintgraph/ |
 | Surveillance Radar | https://unevil-warden.github.io/unevil/radar/ |
 | ReplyGraph demo | https://unevil-warden.github.io/unevil/replygraph/ |
-| JobAgent demo | https://unevil-warden.github.io/unevil/jobagent/ |
+| JobAgent demo | https://unevil-warden.github.io/unevil/jobagent/ ([instant preview](https://raw.githack.com/unevil-warden/unevil/main/jobagent/demo/index.html)) |
 | BetterAsk download | https://unevil-warden.github.io/unevil/betterask/ |
 
 ---
